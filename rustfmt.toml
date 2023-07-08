@@ -1,0 +1,6 @@
+reorder_modules = true
+reorder_imports = true
+imports_indent = "Block"
+imports_layout = "Mixed"
+group_imports = "StdExternalCrate"
+imports_granularity = "Module"

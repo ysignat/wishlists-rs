@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'wishlists'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=wishlists",
+                    "--package=wishlists"
+                ],
+                "filter": {
+                    "name": "wishlists",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'wishlists'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=wishlists",
+                    "--package=wishlists"
+                ],
+                "filter": {
+                    "name": "wishlists",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

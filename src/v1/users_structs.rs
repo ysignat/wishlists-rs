@@ -1,4 +1,6 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Deserialize)]
 pub struct CreateUser {
@@ -16,10 +18,10 @@ pub struct UpdateUser {
 
 #[derive(Serialize)]
 pub struct User {
-    pub id: u64,
+    pub id: Uuid,
     pub name: String,
     pub surname: String,
     pub nickname: String,
-    pub created_at: String,
-    pub last_updated_at: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }

@@ -1,8 +1,25 @@
-use axum::http::StatusCode;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 
-pub fn internal_error<E>(err: E) -> (StatusCode, String)
+pub struct AppError(anyhow::Error);
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Something went wrong: {}", self.0),
+        )
+            .into_response()
+    }
+}
+
+impl<E> From<E> for AppError
 where
-    E: std::error::Error,
+    E: Into<anyhow::Error>,
 {
-    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+    fn from(err: E) -> Self {
+        Self(err.into())
+    }
 }

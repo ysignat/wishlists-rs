@@ -4,7 +4,7 @@ mod v1;
 use axum::{routing::get, Router};
 use sqlx::postgres::PgPoolOptions;
 use std::{net::SocketAddr, time::Duration};
-use v1::users::{create_user, delete_user, get_user, list_users, root, update_user};
+use v1::users::{create_user, delete_user, get_user, list_users, update_user};
 
 #[tokio::main]
 async fn main() {
@@ -19,7 +19,6 @@ async fn main() {
         .expect("can't connect to database");
 
     let app = Router::new()
-        .route("/", get(root))
         .route("/users", get(list_users).post(create_user))
         .route(
             "/users/:id",

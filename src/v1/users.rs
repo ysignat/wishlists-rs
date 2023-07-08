@@ -1,72 +1,136 @@
 use super::users_structs::{CreateUser, UpdateUser, User};
-use crate::utils::internal_error;
+use crate::utils::AppError;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
     Json,
 };
-use chrono::Utc;
 use sqlx::postgres::PgPool;
+use uuid::Uuid;
 
-pub async fn list_users() -> (StatusCode, Json<[u64; 1]>) {
-    let users = [1337];
+pub async fn list_users(
+    State(pool): State<PgPool>,
+) -> Result<(StatusCode, Json<Vec<User>>), AppError> {
+    let users = sqlx::query_as!(
+        User,
+        r#"
+        select 
+          id, 
+          name, 
+          surname, 
+          nickname, 
+          created_at, 
+          updated_at 
+        from users 
+      "#
+    )
+    .fetch_all(&pool)
+    .await?;
 
-    (StatusCode::OK, Json(users))
+    Ok((StatusCode::OK, Json(users)))
 }
 
-pub async fn create_user(Json(payload): Json<CreateUser>) -> (StatusCode, Json<User>) {
-    let now = Utc::now();
+pub async fn create_user(
+    State(pool): State<PgPool>,
+    Json(payload): Json<CreateUser>,
+) -> Result<(StatusCode, Json<User>), AppError> {
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        insert into users (
+          id, 
+          name, 
+          surname, 
+          nickname, 
+          created_at, 
+          updated_at
+        ) values (
+          $1, 
+          $2, 
+          $3, 
+          $4, 
+          now(), 
+          now()
+        ) returning *;
+      "#,
+        Uuid::new_v4(),
+        payload.name,
+        payload.surname,
+        payload.nickname
+    )
+    .fetch_one(&pool)
+    .await?;
 
-    let user = User {
-        id: 1337,
-        name: payload.name,
-        surname: payload.surname,
-        nickname: payload.nickname,
-        created_at: now.to_string(),
-        last_updated_at: now.to_string(),
-    };
-
-    (StatusCode::CREATED, Json(user))
+    Ok((StatusCode::CREATED, Json(user)))
 }
 
-pub async fn get_user(Path(id): Path<u64>) -> (StatusCode, Json<User>) {
-    let user = User {
-        id,
-        name: "Aboba".to_owned(),
-        surname: "Foo".to_owned(),
-        nickname: "Bar".to_owned(),
-        created_at: "1970-01-01 00:00:00.000000000 UTC".to_owned(),
-        last_updated_at: "1970-01-01 00:00:00.000000000 UTC".to_owned(),
-    };
+pub async fn get_user(
+    State(pool): State<PgPool>,
+    Path(id): Path<Uuid>,
+) -> Result<(StatusCode, Json<User>), AppError> {
+    let user = sqlx::query_as!(
+        User,
+        r#"
+          select 
+            id, 
+            name, 
+            surname, 
+            nickname, 
+            created_at, 
+            updated_at 
+          from users 
+          where id = $1;
+        "#,
+        id
+    )
+    .fetch_one(&pool) // TODO change to getch optional
+    .await?;
 
-    (StatusCode::OK, Json(user))
+    Ok((StatusCode::OK, Json(user)))
 }
 
 pub async fn update_user(
-    Path(id): Path<u64>,
+    State(pool): State<PgPool>,
+    Path(id): Path<Uuid>,
     Json(payload): Json<UpdateUser>,
-) -> (StatusCode, Json<User>) {
-    let now = Utc::now();
+) -> Result<(StatusCode, Json<User>), AppError> {
+    let user = sqlx::query_as!(
+        User,
+        r#"
+          update users
+          set
+            name = coalesce($1, name),
+            surname = coalesce($2, surname),
+            nickname = coalesce($3, nickname),
+            updated_at = now()
+          where id = $4
+          returning *;
+        "#,
+        payload.name,
+        payload.surname,
+        payload.nickname,
+        id
+    )
+    .fetch_one(&pool)
+    .await?;
 
-    let user = User {
-        id,
-        name: payload.name.or(Some("Aboba".to_owned())).unwrap(),
-        surname: payload.surname.or(Some("Foo".to_owned())).unwrap(),
-        nickname: payload.nickname.or(Some("Bar".to_owned())).unwrap(),
-        created_at: "1970-01-01 00:00:00.000000000 UTC".to_owned(),
-        last_updated_at: now.to_string(),
-    };
-
-    (StatusCode::OK, Json(user))
+    Ok((StatusCode::OK, Json(user)))
 }
 
-pub async fn delete_user(Path(id): Path<u64>) -> StatusCode {
-    StatusCode::NO_CONTENT
-}
+pub async fn delete_user(
+    State(pool): State<PgPool>,
+    Path(id): Path<Uuid>,
+) -> Result<(StatusCode, String), AppError> {
+    sqlx::query_as!(
+        User,
+        r#"
+          delete from users
+          where id = $1;
+        "#,
+        id
+    )
+    .execute(&pool)
+    .await?;
 
-pub async fn root(State(pool): State<PgPool>) -> Result<String, (StatusCode, String)> {
-    sqlx::query_scalar("select 'hello world from pg'")
-        .fetch_one(&pool)
-        .await
-        .map_err(internal_error)
+    Ok((StatusCode::NO_CONTENT, "User Deleted".to_owned()))
 }

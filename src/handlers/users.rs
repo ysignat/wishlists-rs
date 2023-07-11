@@ -1,4 +1,4 @@
-use super::users_structs::{CreateUser, UpdateUser, User};
+use crate::structs::users::{CreateUser, UpdateUser, User};
 use crate::utils::AppError;
 use axum::{
     extract::{Path, State},
@@ -16,8 +16,8 @@ pub async fn list_users(
         r#"
         select 
           id, 
-          name, 
-          surname, 
+          first_name, 
+          second_name, 
           nickname, 
           created_at, 
           updated_at 
@@ -39,8 +39,8 @@ pub async fn create_user(
         r#"
         insert into users (
           id, 
-          name, 
-          surname, 
+          first_name, 
+          second_name, 
           nickname, 
           created_at, 
           updated_at
@@ -54,8 +54,8 @@ pub async fn create_user(
         ) returning *;
       "#,
         Uuid::new_v4(),
-        payload.name,
-        payload.surname,
+        payload.first_name,
+        payload.second_name,
         payload.nickname
     )
     .fetch_one(&pool)
@@ -73,8 +73,8 @@ pub async fn get_user(
         r#"
           select 
             id, 
-            name, 
-            surname, 
+            first_name, 
+            second_name, 
             nickname, 
             created_at, 
             updated_at 
@@ -83,7 +83,7 @@ pub async fn get_user(
         "#,
         id
     )
-    .fetch_one(&pool) // TODO change to getch optional
+    .fetch_one(&pool) // TODO change to fetch optional
     .await?;
 
     Ok((StatusCode::OK, Json(user)))
@@ -99,15 +99,15 @@ pub async fn update_user(
         r#"
           update users
           set
-            name = coalesce($1, name),
-            surname = coalesce($2, surname),
+            first_name = coalesce($1, first_name),
+            second_name = coalesce($2, second_name),
             nickname = coalesce($3, nickname),
             updated_at = now()
           where id = $4
           returning *;
         "#,
-        payload.name,
-        payload.surname,
+        payload.first_name,
+        payload.second_name,
         payload.nickname,
         id
     )

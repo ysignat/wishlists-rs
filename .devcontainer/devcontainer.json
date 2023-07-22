@@ -9,7 +9,8 @@
     "vscode": {
       "settings": {
         "lldb.executable": "/usr/bin/lldb",
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "rust-analyzer.check.command": "clippy"
       },
       "extensions": [
         "usernamehw.errorlens",

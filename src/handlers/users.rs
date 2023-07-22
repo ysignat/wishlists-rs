@@ -8,9 +8,7 @@ use axum::{
 use sqlx::postgres::PgPool;
 use uuid::Uuid;
 
-pub async fn list_users(
-    State(pool): State<PgPool>,
-) -> Result<(StatusCode, Json<Vec<User>>), AppError> {
+pub async fn list(State(pool): State<PgPool>) -> Result<(StatusCode, Json<Vec<User>>), AppError> {
     let users = sqlx::query_as!(
         User,
         r#"
@@ -30,7 +28,7 @@ pub async fn list_users(
     Ok((StatusCode::OK, Json(users)))
 }
 
-pub async fn create_user(
+pub async fn create(
     State(pool): State<PgPool>,
     Json(payload): Json<CreateUser>,
 ) -> Result<(StatusCode, Json<User>), AppError> {
@@ -64,7 +62,7 @@ pub async fn create_user(
     Ok((StatusCode::CREATED, Json(user)))
 }
 
-pub async fn get_user(
+pub async fn get(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<User>), AppError> {
@@ -89,7 +87,7 @@ pub async fn get_user(
     Ok((StatusCode::OK, Json(user)))
 }
 
-pub async fn update_user(
+pub async fn update(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdateUser>,
@@ -117,7 +115,7 @@ pub async fn update_user(
     Ok((StatusCode::OK, Json(user)))
 }
 
-pub async fn delete_user(
+pub async fn delete(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {

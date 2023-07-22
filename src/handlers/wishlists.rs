@@ -8,7 +8,7 @@ use axum::{
 use sqlx::postgres::PgPool;
 use uuid::Uuid;
 
-pub async fn list_wishlists(
+pub async fn list(
     State(pool): State<PgPool>,
     Query(params): Query<WishlistQueryParams>,
 ) -> Result<(StatusCode, Json<Vec<Wishlist>>), AppError> {
@@ -32,7 +32,7 @@ pub async fn list_wishlists(
     Ok((StatusCode::OK, Json(wishlists)))
 }
 
-pub async fn create_wishlist(
+pub async fn create(
     State(pool): State<PgPool>,
     Json(payload): Json<CreateWishlist>,
 ) -> Result<(StatusCode, Json<Wishlist>), AppError> {
@@ -63,7 +63,7 @@ pub async fn create_wishlist(
     Ok((StatusCode::CREATED, Json(wishlist)))
 }
 
-pub async fn get_wishlist(
+pub async fn get(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<Wishlist>), AppError> {
@@ -88,7 +88,7 @@ pub async fn get_wishlist(
     Ok((StatusCode::OK, Json(wishlist)))
 }
 
-pub async fn update_wishlist(
+pub async fn update(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdateWishlist>,
@@ -112,7 +112,7 @@ pub async fn update_wishlist(
     Ok((StatusCode::OK, Json(wishlist)))
 }
 
-pub async fn delete_wishlist(
+pub async fn delete(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {

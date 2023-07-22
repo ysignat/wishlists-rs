@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 mod config;
 mod handlers;
 mod structs;
@@ -6,10 +7,7 @@ mod utils;
 use axum::{routing::get, Router};
 use clap::Parser;
 use config::Config;
-use handlers::{
-    users::{create_user, delete_user, get_user, list_users, update_user},
-    wishlists::{create_wishlist, delete_wishlist, get_wishlist, list_wishlists, update_wishlist},
-};
+use handlers::{users, wishlists};
 use sqlx::postgres::PgPoolOptions;
 use std::{net::SocketAddr, time::Duration};
 
@@ -33,13 +31,15 @@ async fn main() {
         .acquire_timeout(Duration::from_secs(config.postgres_pool_acquire_timeout))
         .connect(&config.postgres_url)
         .await
-        .expect(&format!(
-            "Cannot create connection pool for URL: {}",
-            config.postgres_url
-        ));
+        .unwrap_or_else(|_| {
+            panic!(
+                "Cannot create connection pool for URL: {}",
+                config.postgres_url
+            )
+        });
 
     let root_path = if config.app_root_path == "/" {
-        "".to_owned()
+        String::new()
     } else {
         config.app_root_path
     };
@@ -47,28 +47,28 @@ async fn main() {
     let app = Router::new()
         .route(
             &format!("{root_path}/users"),
-            get(list_users).post(create_user),
+            get(users::list).post(users::create),
         )
         .route(
             &format!("{root_path}/users/:id"),
-            get(get_user).put(update_user).delete(delete_user),
+            get(users::get).put(users::update).delete(users::delete),
         )
         .route(
             &format!("{root_path}/wishlists"),
-            get(list_wishlists).post(create_wishlist),
+            get(wishlists::list).post(wishlists::create),
         )
         .route(
             &format!("{root_path}/wishlists/:id"),
-            get(get_wishlist)
-                .put(update_wishlist)
-                .delete(delete_wishlist),
+            get(wishlists::get)
+                .put(wishlists::update)
+                .delete(wishlists::delete),
         )
         .with_state(pool);
 
-    let addr: SocketAddr = config.app_bind_address.parse().expect(&format!(
-        "Invalid bind address: {}",
-        config.app_bind_address
-    ));
+    let addr: SocketAddr = config
+        .app_bind_address
+        .parse()
+        .unwrap_or_else(|_| panic!("Invalid bind address: {}", config.app_bind_address));
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await

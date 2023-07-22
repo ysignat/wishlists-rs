@@ -1,0 +1,29 @@
+{
+  "name": "Wishlists",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "main",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+  "remoteUser": "vscode",
+  "overrideCommand": false,
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "lldb.executable": "/usr/bin/lldb",
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
+      "extensions": [
+        "usernamehw.errorlens",
+        "tamasfe.even-better-toml",
+        "eamodio.gitlens",
+        "skellock.just",
+        "azemoh.one-monokai",
+        "rust-lang.rust-analyzer",
+        "rangav.vscode-thunder-client",
+        "wayou.vscode-todo-highlight",
+        "vadimcn.vscode-lldb",
+        "serayuzgur.crates",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+version: '3.5'
+services:
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: vscode
+    command: sleep infinity
+    volumes:
+      - ..:/workspace/wishlists:cached
+      - wishlists-vscode-extensions:/home/vscode/.vscode-server/extensions:rw
+    init: true
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    network_mode: service:main
+volumes:
+  wishlists-vscode-extensions: {}

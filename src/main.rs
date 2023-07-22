@@ -1,8 +1,11 @@
+mod config;
 mod handlers;
 mod structs;
 mod utils;
 
 use axum::{routing::get, Router};
+use clap::Parser;
+use config::Config;
 use handlers::{
     users::{create_user, delete_user, get_user, list_users, update_user},
     wishlists::{create_wishlist, delete_wishlist, get_wishlist, list_wishlists, update_wishlist},
@@ -19,39 +22,55 @@ use std::{net::SocketAddr, time::Duration};
 // TODO: Oauth2
 // TODO: Migrations Automation
 // TODO: CI
-// TODO: Configuration from env
 // TODO: Logging
 
 #[tokio::main]
 async fn main() {
-    let db_connection_str = std::env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgres://postgres:password@localhost".to_string());
+    let config = Config::parse();
 
     let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .acquire_timeout(Duration::from_secs(3))
-        .connect(&db_connection_str)
+        .max_connections(config.postgres_pool_size)
+        .acquire_timeout(Duration::from_secs(config.postgres_pool_acquire_timeout))
+        .connect(&config.postgres_url)
         .await
-        .expect("can't connect to database");
+        .expect(&format!(
+            "Cannot create connection pool for URL: {}",
+            config.postgres_url
+        ));
+
+    let root_path = if config.app_root_path == "/" {
+        "".to_owned()
+    } else {
+        config.app_root_path
+    };
 
     let app = Router::new()
-        .route("/users", get(list_users).post(create_user))
         .route(
-            "/users/:id",
+            &format!("{root_path}/users"),
+            get(list_users).post(create_user),
+        )
+        .route(
+            &format!("{root_path}/users/:id"),
             get(get_user).put(update_user).delete(delete_user),
         )
-        .route("/wishlists", get(list_wishlists).post(create_wishlist))
         .route(
-            "/wishlists/:id",
+            &format!("{root_path}/wishlists"),
+            get(list_wishlists).post(create_wishlist),
+        )
+        .route(
+            &format!("{root_path}/wishlists/:id"),
             get(get_wishlist)
                 .put(update_wishlist)
                 .delete(delete_wishlist),
         )
         .with_state(pool);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr: SocketAddr = config.app_bind_address.parse().expect(&format!(
+        "Invalid bind address: {}",
+        config.app_bind_address
+    ));
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
-        .unwrap();
+        .expect("Cannot start server");
 }

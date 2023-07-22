@@ -10,17 +10,17 @@ use handlers::{
 use sqlx::postgres::PgPoolOptions;
 use std::{net::SocketAddr, time::Duration};
 
-// TODO Constraints checks https://github.com/launchbadge/realworld-axum-sqlx/blob/f1b25654773228297e35c292f357d33b7121a101/src/http/users.rs#L80
-// TODO Tests
-// TODO Dockerfile
-// TODO Helm Chart
-// TODO SwaggerUI
-// TODO Prometheus
-// TODO Oauth2
-// TODO Migrations Automation
-// TODO CI
-// TODO Configuration from env
-// TODO Logging
+// TODO: Constraints checks https://github.com/launchbadge/realworld-axum-sqlx/blob/f1b25654773228297e35c292f357d33b7121a101/src/http/users.rs#L80
+// TODO: Tests
+// TODO: Dockerfile
+// TODO: Helm Chart
+// TODO: SwaggerUI
+// TODO: Prometheus
+// TODO: Oauth2
+// TODO: Migrations Automation
+// TODO: CI
+// TODO: Configuration from env
+// TODO: Logging
 
 #[tokio::main]
 async fn main() {

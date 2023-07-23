@@ -6,25 +6,16 @@ FROM rust:${RUST_VERSION}-slim-${DEBIAN_VERSION} as build
 
 WORKDIR /build
 
-COPY src/ src/
-COPY .cargo/ .cargo/
-COPY .sqlx/ .sqlx/
-COPY Cargo.lock Cargo.lock
-COPY Cargo.toml Cargo.toml
-
 ARG CARGO_INSTALL_ROOT
-ARG BUILD_PROFILE="release"
-ARG CARGO_CHANNEL="x86_64-unknown-linux-gnu"
+COPY Cargo.* ./
+COPY src/ src/
+COPY .sqlx/ .sqlx/ 
 RUN \
   cargo install \
   --path . \
-  --all-features \
   --locked \
-  --profile "${BUILD_PROFILE}" \
-  && cargo build \
-  --all-features \
-  --locked \
-  --profile "${BUILD_PROFILE}"
+  --profile release \
+  --target x86_64-unknown-linux-gnu
 
 FROM debian:${DEBIAN_VERSION}-slim as release
 

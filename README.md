@@ -13,5 +13,9 @@
 - TODO: Build .sqlx folder in pipeline, pass to Build stage as artifact
 - TODO: Divide routes creations for groups
 - TODO: Generate models from sqlx migrations
-- TODO: Add musl target and change docker images to alpine based
 - TODO: Healthchecks
+- TODO: Distroless docker image (scratch)
+- TODO: Minimize deps
+- TODO: apt-key in devcontainer is deprecated
+- TODO: debug
+- TODO: mount /var/lib/docker to devcontainer

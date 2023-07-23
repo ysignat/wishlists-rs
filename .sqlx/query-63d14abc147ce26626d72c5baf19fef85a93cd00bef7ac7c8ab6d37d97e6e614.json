@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n          delete from wishlists\n          where id = $1;\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "63d14abc147ce26626d72c5baf19fef85a93cd00bef7ac7c8ab6d37d97e6e614"
+}

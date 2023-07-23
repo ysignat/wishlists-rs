@@ -1,0 +1,55 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        insert into users (\n          id, \n          first_name, \n          second_name, \n          nickname, \n          created_at, \n          updated_at\n        ) values (\n          $1, \n          $2, \n          $3, \n          $4, \n          now(), \n          now()\n        ) returning *;\n      ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "second_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "nickname",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "71f59554a2c8e9d5fc44f279e085873f67e4a3dcf9c79a9cf0bcd1226bf6ed55"
+}

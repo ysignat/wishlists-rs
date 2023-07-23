@@ -13,21 +13,21 @@
         "rust-analyzer.check.command": "clippy"
       },
       "extensions": [
-		"usernamehw.errorlens",
-		"tamasfe.even-better-toml",
-		"eamodio.gitlens",
-		"skellock.just",
-		"azemoh.one-monokai",
-		"rust-lang.rust-analyzer",
-		"rangav.vscode-thunder-client",
-		"wayou.vscode-todo-highlight",
-		"vadimcn.vscode-lldb",
-		"serayuzgur.crates",
-		"ms-azuretools.vscode-docker",
-		"EditorConfig.EditorConfig",
-		"DavidAnson.vscode-markdownlint",
-		"yzhang.markdown-all-in-one"
-	]
+        "usernamehw.errorlens",
+        "tamasfe.even-better-toml",
+        "eamodio.gitlens",
+        "skellock.just",
+        "azemoh.one-monokai",
+        "rust-lang.rust-analyzer",
+        "rangav.vscode-thunder-client",
+        "wayou.vscode-todo-highlight",
+        "vadimcn.vscode-lldb",
+        "serayuzgur.crates",
+        "ms-azuretools.vscode-docker",
+        "EditorConfig.EditorConfig",
+        "DavidAnson.vscode-markdownlint",
+        "yzhang.markdown-all-in-one"
+      ]
     }
   }
 }

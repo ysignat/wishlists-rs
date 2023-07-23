@@ -1,8 +1,12 @@
 ARG RUST_VERSION="1.71.0"
-ARG DEBIAN_VERSION="bookworm"
+ARG ALPINE_VERSION="3.18"
 ARG CARGO_INSTALL_ROOT="/dist"
 
-FROM rust:${RUST_VERSION}-slim-${DEBIAN_VERSION} as build
+FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as build
+
+RUN \
+  apk update && apk upgrade \
+  && apk add musl-dev
 
 WORKDIR /build
 
@@ -15,9 +19,9 @@ RUN \
   --path . \
   --locked \
   --profile release \
-  --target x86_64-unknown-linux-gnu
+  --target x86_64-unknown-linux-musl
 
-FROM debian:${DEBIAN_VERSION}-slim as release
+FROM alpine:${ALPINE_VERSION} as release
 
 ARG CARGO_INSTALL_ROOT
 ARG USER="user"

@@ -1,18 +1,22 @@
 ARG RUST_VERSION="1.71.0"
-ARG DEBIAN_VERSION="bookworm"
+ARG ALPINE_VERSION="3.18"
 ARG CARGO_INSTALL_ROOT="/dist"
 
-FROM rust:${RUST_VERSION}-slim-${DEBIAN_VERSION} as build
+FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as build
 
 ARG CARGO_INSTALL_ROOT
 ARG SQLX_CLI_VERSION="0.7.1"
+
+RUN \
+  apk update && apk upgrade \
+  && apk add openssl-dev musl-dev
+
 RUN \
   cargo install sqlx-cli \
-  --no-default-features \
-  --features postgres \
-  --version "${SQLX_CLI_VERSION}"
+  --version "${SQLX_CLI_VERSION}" \
+  -F postgres
 
-FROM rust:${RUST_VERSION}-slim-${DEBIAN_VERSION}
+FROM alpine:${ALPINE_VERSION}
 
 ARG CARGO_INSTALL_ROOT
 ARG USER="user"
@@ -30,4 +34,4 @@ WORKDIR "${HOME}"
 COPY migrations/ migrations/
 
 USER "${USER}"
-ENTRYPOINT [ "sqlx" ]
+ENTRYPOINT [ "/bin/sqlx" ]

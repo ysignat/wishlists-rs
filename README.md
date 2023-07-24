@@ -10,12 +10,16 @@
 - TODO: Oauth2
 - TODO: CI
 - TODO: Logging
-- TODO: Build .sqlx folder in pipeline, pass to Build stage as artifact
 - TODO: Divide routes creations for groups
 - TODO: Generate models from sqlx migrations
 - TODO: Healthchecks
 - TODO: Distroless docker image (scratch)
 - TODO: Minimize deps
-- TODO: apt-key in devcontainer is deprecated
-- TODO: debug
-- TODO: mount /var/lib/docker to devcontainer
+- TODO: Debugging
+- TODO: Mount /var/lib/docker to devcontainer
+- TODO: Friends API
+- TODO: Items API
+- TODO: S3 storage
+- TODO: Authorization
+- TODO: Cache kv storage
+ 

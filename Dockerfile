@@ -14,6 +14,7 @@ ARG CARGO_INSTALL_ROOT
 COPY Cargo.* ./
 COPY src/ src/
 COPY .sqlx/ .sqlx/ 
+COPY migrations/ migrations/
 RUN \
   cargo install \
   --path . \

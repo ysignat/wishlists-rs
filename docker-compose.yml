@@ -17,12 +17,10 @@ services:
   migrations:
     build:
       context: .
-      dockerfile: migrations.dockerfile
-    command:
-      - migrate
-      - run
+      dockerfile: Dockerfile
     environment:
-      DATABASE_URL: *postgres_url
+      WISHLISTS__POSTGRES_URL: *postgres_url
+      WISHLISTS__MIGRATE: "true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -33,7 +31,7 @@ services:
       POSTGRES_USER: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5

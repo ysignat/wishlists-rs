@@ -27,39 +27,46 @@ async fn main() {
             )
         });
 
-    let root_path = if config.app_root_path == "/" {
-        String::new()
+    if config.migrate {
+        sqlx::migrate!()
+            .run(&pool)
+            .await
+            .expect("Migration not successful");
     } else {
-        config.app_root_path
-    };
+        let root_path = if config.app_root_path == "/" {
+            String::new()
+        } else {
+            config.app_root_path
+        };
 
-    let app = Router::new()
-        .route(
-            &format!("{root_path}/users"),
-            get(users::list).post(users::create),
-        )
-        .route(
-            &format!("{root_path}/users/:id"),
-            get(users::get).put(users::update).delete(users::delete),
-        )
-        .route(
-            &format!("{root_path}/wishlists"),
-            get(wishlists::list).post(wishlists::create),
-        )
-        .route(
-            &format!("{root_path}/wishlists/:id"),
-            get(wishlists::get)
-                .put(wishlists::update)
-                .delete(wishlists::delete),
-        )
-        .with_state(pool);
+        let app = Router::new()
+            .route(
+                &format!("{root_path}/users"),
+                get(users::list).post(users::create),
+            )
+            .route(
+                &format!("{root_path}/users/:id"),
+                get(users::get).put(users::update).delete(users::delete),
+            )
+            .route(
+                &format!("{root_path}/wishlists"),
+                get(wishlists::list).post(wishlists::create),
+            )
+            .route(
+                &format!("{root_path}/wishlists/:id"),
+                get(wishlists::get)
+                    .put(wishlists::update)
+                    .delete(wishlists::delete),
+            )
+            .with_state(pool);
 
-    let addr: SocketAddr = config
-        .app_bind_address
-        .parse()
-        .unwrap_or_else(|_| panic!("Invalid bind address: {}", config.app_bind_address));
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .expect("Cannot start server");
+        let addr: SocketAddr = config
+            .app_bind_address
+            .parse()
+            .unwrap_or_else(|_| panic!("Invalid bind address: {}", config.app_bind_address));
+        axum::Server::bind(&addr)
+            .serve(app.into_make_service())
+            .await
+            .expect("Cannot start server");
+    }
 }

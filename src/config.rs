@@ -10,6 +10,13 @@ use clap::Parser;
 pub struct Config {
     #[arg(
         long,
+        env = "WISHLISTS__MIGRATE",
+        default_value = "false",
+        help = "Run migrations with `--postgres-url` and exit"
+    )]
+    pub migrate: bool,
+    #[arg(
+        long,
         env = "WISHLISTS__POSTGRES_URL",
         default_value = "postgres://postgres:postgres@postgres:5432/postgres",
         help = "URL for Postgres connection (postgres://<user>:<password>@<host>:<port>/<database>)"

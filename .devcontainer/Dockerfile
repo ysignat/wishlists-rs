@@ -2,20 +2,12 @@ ARG VARIANT="bookworm"
 
 FROM mcr.microsoft.com/vscode/devcontainers/rust:${VARIANT}
 
-ENV DOCKER_BUILDKIT=1
-
-# DFD
-ARG DFD_SCRIPT_VERSION="v0.245.2"
-ADD https://raw.githubusercontent.com/microsoft/vscode-dev-containers/${DFD_SCRIPT_VERSION}/containers/docker-from-docker-compose/.devcontainer/library-scripts/docker-debian.sh \
-  /tmp/library-scripts/docker-debian.sh
-RUN \
-  /bin/bash /tmp/library-scripts/docker-debian.sh
-
 # Apt-get
 ARG POSTGRES_VERSION="15"
 RUN \ 
   echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
   && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
+  && apt-get update \
   && apt-get install --yes --no-install-recommends postgresql-client-${POSTGRES_VERSION} \
   && apt-get clean --yes \
   && apt-get autoremove -yqq --purge \

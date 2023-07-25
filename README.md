@@ -21,4 +21,3 @@
 - TODO: S3 storage
 - TODO: Authorization
 - TODO: Cache kv storage
-- TODO: Avoid extensions reinstall

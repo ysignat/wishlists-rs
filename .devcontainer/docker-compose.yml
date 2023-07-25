@@ -5,15 +5,13 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ..:/workspace/wishlists:cached
-      - wishlists-vscode-extensions:/home/vscode/.vscode-server/extensions:rw
-    init: true
-    privileged: true
+      - /var/run/docker.sock:/var/run/docker-host.sock
+      - ..:/workspace:cached
+    entrypoint: /usr/local/share/docker-init.sh
+    command: sleep infinity
   postgres:
     image: postgres:15-alpine
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
-volumes:
-  wishlists-vscode-extensions: {}

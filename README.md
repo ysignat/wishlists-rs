@@ -16,10 +16,9 @@
 - TODO: Distroless docker image (scratch)
 - TODO: Minimize deps
 - TODO: Debugging
-- TODO: Mount /var/lib/docker to devcontainer
 - TODO: Friends API
 - TODO: Items API
 - TODO: S3 storage
 - TODO: Authorization
 - TODO: Cache kv storage
- 
+- TODO: Avoid extensions reinstall

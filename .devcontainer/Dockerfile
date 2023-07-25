@@ -4,13 +4,12 @@ FROM mcr.microsoft.com/vscode/devcontainers/rust:${VARIANT}
 
 ENV DOCKER_BUILDKIT=1
 
-# DIND
-ADD https://raw.githubusercontent.com/microsoft/vscode-dev-containers/v0.245.2/containers/docker-in-docker/.devcontainer/library-scripts/docker-in-docker-debian.sh \
-  /tmp/docker-in-docker-debian.sh
-ARG DEBIAN_FRONTEND="noninteractive"
-ARG DIND_SCRIPT_VERSION="v0.245.2"
+# DFD
+ARG DFD_SCRIPT_VERSION="v0.245.2"
+ADD https://raw.githubusercontent.com/microsoft/vscode-dev-containers/${DFD_SCRIPT_VERSION}/containers/docker-from-docker-compose/.devcontainer/library-scripts/docker-debian.sh \
+  /tmp/library-scripts/docker-debian.sh
 RUN \
-  /bin/bash /tmp/docker-in-docker-debian.sh
+  /bin/bash /tmp/library-scripts/docker-debian.sh
 
 # Apt-get
 ARG POSTGRES_VERSION="15"
@@ -56,6 +55,3 @@ ENV PGDATABASE="postgres"
 ENV PGUSER="postgres"
 ENV PGPASSWORD="postgres"
 ENV DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}"
-
-ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
-CMD [ "sleep", "infinity" ]

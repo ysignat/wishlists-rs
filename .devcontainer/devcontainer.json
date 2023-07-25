@@ -4,7 +4,6 @@
   "service": "main",
   "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
   "remoteUser": "vscode",
-  "overrideCommand": false,
   "customizations": {
     "vscode": {
       "settings": {

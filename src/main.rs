@@ -3,13 +3,14 @@ mod config;
 mod handlers;
 mod utils;
 
-use axum::{routing::get, Router};
+use axum::Router;
 use clap::Parser;
 use config::Config;
 use handlers::{users, wishlists};
 use migrations::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
 use std::{net::SocketAddr, time::Duration};
+use utils::AppState;
 
 #[tokio::main]
 async fn main() {
@@ -40,26 +41,13 @@ async fn main() {
             config.app_root_path
         };
 
+        let app_state = AppState {
+            postgres_connection: db,
+        };
+
         let app = Router::new()
-            .route(
-                &format!("{root_path}/users"),
-                get(users::list).post(users::create),
-            )
-            .route(
-                &format!("{root_path}/users/:id"),
-                get(users::get).put(users::update).delete(users::delete),
-            )
-            .route(
-                &format!("{root_path}/wishlists"),
-                get(wishlists::list).post(wishlists::create),
-            )
-            .route(
-                &format!("{root_path}/wishlists/:id"),
-                get(wishlists::get)
-                    .put(wishlists::update)
-                    .delete(wishlists::delete),
-            )
-            .with_state(db);
+            .merge(users::get_router(&root_path, app_state.clone()))
+            .merge(wishlists::get_router(&root_path, app_state));
 
         let addr: SocketAddr = config
             .app_bind_address

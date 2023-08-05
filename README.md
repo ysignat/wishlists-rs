@@ -10,7 +10,6 @@
 - TODO: Oauth2
 - TODO: CI
 - TODO: Logging
-- TODO: Divide routes creations for groups
 - TODO: Healthchecks
 - TODO: Distroless docker image (scratch)
 - TODO: Minimize deps

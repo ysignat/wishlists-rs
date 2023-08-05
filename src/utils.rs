@@ -2,6 +2,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use sea_orm::DatabaseConnection;
 
 pub struct AppError(anyhow::Error);
 
@@ -21,5 +22,17 @@ where
 {
     fn from(err: E) -> Self {
         Self(err.into())
+    }
+}
+
+pub struct AppState {
+    pub postgres_connection: DatabaseConnection,
+}
+
+impl Clone for AppState {
+    fn clone(&self) -> Self {
+        AppState {
+            postgres_connection: self.postgres_connection.clone(),
+        }
     }
 }

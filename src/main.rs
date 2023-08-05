@@ -6,7 +6,7 @@ mod utils;
 use axum::Router;
 use clap::Parser;
 use config::Config;
-use handlers::{users, wishlists};
+use handlers::{health, users, wishlists};
 use migrations::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
 use std::{net::SocketAddr, time::Duration};
@@ -47,7 +47,8 @@ async fn main() {
 
         let app = Router::new()
             .merge(users::get_router(&root_path, app_state.clone()))
-            .merge(wishlists::get_router(&root_path, app_state));
+            .merge(wishlists::get_router(&root_path, app_state))
+            .merge(health::get_router(&root_path));
 
         let addr: SocketAddr = config
             .app_bind_address

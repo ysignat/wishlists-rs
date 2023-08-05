@@ -24,7 +24,7 @@ pub fn get_router(root_path: &str, state: AppState) -> Router {
         .with_state(state)
 }
 
-pub async fn list(
+async fn list(
     State(state): State<AppState>,
 ) -> Result<(StatusCode, Json<Vec<WishlistModel>>), AppError> {
     let wishlists = Wishlist::find().all(&state.postgres_connection).await?;
@@ -32,7 +32,7 @@ pub async fn list(
     Ok((StatusCode::OK, Json(wishlists)))
 }
 
-pub async fn create(
+async fn create(
     State(state): State<AppState>,
     Json(payload): Json<WishlistModel>,
 ) -> Result<(StatusCode, Json<WishlistModel>), AppError> {
@@ -51,7 +51,7 @@ pub async fn create(
     Ok((StatusCode::CREATED, Json(user)))
 }
 
-pub async fn get(
+async fn get(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<WishlistModel>), AppError> {
@@ -63,7 +63,7 @@ pub async fn get(
     Ok((StatusCode::OK, Json(wishlist)))
 }
 
-pub async fn update(
+async fn update(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
     Json(payload): Json<WishlistModel>,
@@ -84,7 +84,7 @@ pub async fn update(
     Ok((StatusCode::OK, Json(user)))
 }
 
-pub async fn delete(
+async fn delete(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {

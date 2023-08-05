@@ -1,131 +1,78 @@
-use crate::structs::wishlists::{CreateWishlist, UpdateWishlist, Wishlist, WishlistQueryParams};
 use crate::utils::AppError;
 use axum::{
-    extract::{Path, Query, State},
+    extract::{Path, State},
     http::StatusCode,
     Json,
 };
-use sqlx::postgres::PgPool;
+use chrono::offset::Utc;
+use entities::wishlists::ActiveModel as WishlistActiveModel;
+use entities::wishlists::Entity as Wishlist;
+use entities::wishlists::Model as WishlistModel;
+use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, Set};
 use uuid::Uuid;
 
 pub async fn list(
-    State(pool): State<PgPool>,
-    Query(params): Query<WishlistQueryParams>,
-) -> Result<(StatusCode, Json<Vec<Wishlist>>), AppError> {
-    let wishlists = sqlx::query_as!(
-        Wishlist,
-        r#"
-          select 
-            id,
-            user_id,
-            name, 
-            created_at, 
-            updated_at 
-          from wishlists
-          where user_id = $1; 
-        "#,
-        params.user_id
-    )
-    .fetch_all(&pool)
-    .await?;
+    State(connection): State<DatabaseConnection>,
+) -> Result<(StatusCode, Json<Vec<WishlistModel>>), AppError> {
+    let wishlists = Wishlist::find().all(&connection).await?;
 
     Ok((StatusCode::OK, Json(wishlists)))
 }
 
 pub async fn create(
-    State(pool): State<PgPool>,
-    Json(payload): Json<CreateWishlist>,
-) -> Result<(StatusCode, Json<Wishlist>), AppError> {
-    let wishlist = sqlx::query_as!(
-        Wishlist,
-        r#"
-          insert into wishlists (
-            id,
-            user_id, 
-            name, 
-            created_at, 
-            updated_at
-          ) values (
-            $1, 
-            $2, 
-            $3, 
-            now(), 
-            now()
-          ) returning *;
-        "#,
-        Uuid::new_v4(),
-        payload.user_id,
-        payload.name,
-    )
-    .fetch_one(&pool)
+    State(connection): State<DatabaseConnection>,
+    Json(payload): Json<WishlistModel>,
+) -> Result<(StatusCode, Json<WishlistModel>), AppError> {
+    let now = Utc::now().naive_utc();
+
+    let user = WishlistActiveModel {
+        id: ActiveValue::Set(Uuid::new_v4()),
+        user_id: ActiveValue::Set(payload.user_id),
+        name: ActiveValue::Set(payload.name),
+        created_at: ActiveValue::Set(now),
+        updated_at: ActiveValue::Set(now),
+    }
+    .insert(&connection)
     .await?;
 
-    Ok((StatusCode::CREATED, Json(wishlist)))
+    Ok((StatusCode::CREATED, Json(user)))
 }
 
 pub async fn get(
-    State(pool): State<PgPool>,
+    State(connection): State<DatabaseConnection>,
     Path(id): Path<Uuid>,
-) -> Result<(StatusCode, Json<Wishlist>), AppError> {
-    let wishlist = sqlx::query_as!(
-        Wishlist,
-        r#"
-          select 
-            id, 
-            user_id,
-            name, 
-            created_at, 
-            updated_at 
-          from wishlists 
-          where 
-            id = $1;
-        "#,
-        id,
-    )
-    .fetch_one(&pool) // TODO change to fetch optional
-    .await?;
+) -> Result<(StatusCode, Json<WishlistModel>), AppError> {
+    let wishlist = Wishlist::find_by_id(id).one(&connection).await?.unwrap();
 
     Ok((StatusCode::OK, Json(wishlist)))
 }
 
 pub async fn update(
-    State(pool): State<PgPool>,
+    State(connection): State<DatabaseConnection>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<UpdateWishlist>,
-) -> Result<(StatusCode, Json<Wishlist>), AppError> {
-    let wishlist = sqlx::query_as!(
-        Wishlist,
-        r#"
-          update wishlists
-          set
-            name = coalesce($1, name),
-            updated_at = now()
-          where id = $2
-          returning *;
-        "#,
-        payload.name,
-        id
-    )
-    .fetch_one(&pool)
-    .await?;
+    Json(payload): Json<WishlistModel>,
+) -> Result<(StatusCode, Json<WishlistModel>), AppError> {
+    let now = Utc::now().naive_utc();
 
-    Ok((StatusCode::OK, Json(wishlist)))
+    let mut wishlist: WishlistActiveModel = Wishlist::find_by_id(id)
+        .one(&connection)
+        .await?
+        .unwrap()
+        .into();
+
+    wishlist.name = Set(payload.name);
+    wishlist.updated_at = Set(now);
+
+    let user = wishlist.update(&connection).await?;
+
+    Ok((StatusCode::OK, Json(user)))
 }
 
 pub async fn delete(
-    State(pool): State<PgPool>,
+    State(connection): State<DatabaseConnection>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {
-    sqlx::query_as!(
-        User,
-        r#"
-          delete from wishlists
-          where id = $1;
-        "#,
-        id
-    )
-    .execute(&pool)
-    .await?;
+    let _ = Wishlist::delete_by_id(id).exec(&connection).await?;
 
     Ok((StatusCode::NO_CONTENT, "Wishlist Deleted".to_owned()))
 }

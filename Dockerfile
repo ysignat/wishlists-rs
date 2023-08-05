@@ -13,8 +13,7 @@ WORKDIR /build
 ARG CARGO_INSTALL_ROOT
 COPY Cargo.* ./
 COPY src/ src/
-COPY .sqlx/ .sqlx/ 
-COPY migrations/ migrations/
+COPY crates/ crates/ 
 RUN \
   cargo install \
   --path . \

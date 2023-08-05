@@ -11,7 +11,6 @@
 - TODO: CI
 - TODO: Logging
 - TODO: Divide routes creations for groups
-- TODO: Generate models from sqlx migrations
 - TODO: Healthchecks
 - TODO: Distroless docker image (scratch)
 - TODO: Minimize deps
@@ -21,3 +20,4 @@
 - TODO: S3 storage
 - TODO: Authorization
 - TODO: Cache kv storage
+- TODO: Error handling

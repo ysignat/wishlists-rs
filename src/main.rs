@@ -1,35 +1,36 @@
 #![warn(clippy::pedantic)]
 mod config;
 mod handlers;
-mod structs;
 mod utils;
 
 use axum::{routing::get, Router};
 use clap::Parser;
 use config::Config;
 use handlers::{users, wishlists};
-use sqlx::postgres::PgPoolOptions;
+use migrations::{Migrator, MigratorTrait};
+use sea_orm::{ConnectOptions, Database};
 use std::{net::SocketAddr, time::Duration};
 
 #[tokio::main]
 async fn main() {
     let config = Config::parse();
 
-    let pool = PgPoolOptions::new()
-        .max_connections(config.postgres_pool_size)
+    let mut connection_opts = ConnectOptions::new(config.postgres_url.clone());
+    connection_opts
         .acquire_timeout(Duration::from_secs(config.postgres_pool_acquire_timeout))
-        .connect(&config.postgres_url)
+        .max_connections(config.postgres_pool_size);
+
+    let db = Database::connect(connection_opts)
         .await
         .unwrap_or_else(|_| {
             panic!(
                 "Cannot create connection pool for URL: {}",
-                config.postgres_url
+                &config.postgres_url
             )
         });
 
     if config.migrate {
-        sqlx::migrate!()
-            .run(&pool)
+        Migrator::up(&db, None)
             .await
             .expect("Migration not successful");
     } else {
@@ -58,12 +59,13 @@ async fn main() {
                     .put(wishlists::update)
                     .delete(wishlists::delete),
             )
-            .with_state(pool);
+            .with_state(db);
 
         let addr: SocketAddr = config
             .app_bind_address
             .parse()
             .unwrap_or_else(|_| panic!("Invalid bind address: {}", config.app_bind_address));
+
         axum::Server::bind(&addr)
             .serve(app.into_make_service())
             .await

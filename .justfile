@@ -4,11 +4,24 @@ default:
   @just --list
 
 create-migration NAME:
-  sqlx migrate add -r {{ NAME }}
+  sea-orm-cli \
+    migrate \
+    generate \
+    --universal-time \
+    -d crates/migrations \
+    {{ NAME }}
 
 migrate:
   #!/usr/bin/env sh
   set -eu
   
-  sqlx database reset -y
-  sqlx migrate run
+  sea-orm-cli \
+    migrate \
+    fresh \
+    -d crates/migrations
+  
+  sea-orm-cli \
+    generate \
+    entity \
+    -o crates/entities/src \
+    -l

@@ -3,39 +3,49 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "wishlists")]
+#[sea_orm(table_name = "items")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
+    pub wishlist_id: Uuid,
+    pub selected_by_id: Option<Uuid>,
     pub name: String,
-    pub user_id: Uuid,
+    pub description: Option<String>,
+    pub price: Option<i32>,
+    pub is_hidden: bool,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::items::Entity")]
-    Items,
     #[sea_orm(
         belongs_to = "super::users::Entity",
-        from = "Column::UserId",
+        from = "Column::SelectedById",
         to = "super::users::Column::Id",
         on_update = "NoAction",
         on_delete = "Cascade"
     )]
     Users,
-}
-
-impl Related<super::items::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Items.def()
-    }
+    #[sea_orm(
+        belongs_to = "super::wishlists::Entity",
+        from = "Column::WishlistId",
+        to = "super::wishlists::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    Wishlists,
 }
 
 impl Related<super::users::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Users.def()
+    }
+}
+
+impl Related<super::wishlists::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Wishlists.def()
     }
 }
 

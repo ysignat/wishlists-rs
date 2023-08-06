@@ -2,19 +2,20 @@
 
 ## TODO
 
-- TODO: [Constraints checks](https://github.com/launchbadge/realworld-axum-sqlx/blob/f1b25654773228297e35c292f357d33b7121a101/src/http/users.rs#L80)
-- TODO: Tests
-- TODO: Helm Chart
+- TODO: Database side validations
+- TODO: Server side validations
+- TODO: Database tests
+- TODO: Logging
+- TODO: API tests
 - TODO: SwaggerUI
 - TODO: Prometheus
 - TODO: Oauth2
 - TODO: CI
-- TODO: Logging
+- TODO: Helm Chart
 - TODO: Distroless docker image (scratch)
 - TODO: Minimize deps
 - TODO: Debugging
 - TODO: Friends API
-- TODO: Items API
 - TODO: S3 storage
 - TODO: Authorization
 - TODO: Cache kv storage

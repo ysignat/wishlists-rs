@@ -36,9 +36,9 @@ async fn main() {
             .expect("Migration not successful");
     } else {
         let root_path = if config.app_root_path == "/" {
-            String::new()
+            ""
         } else {
-            config.app_root_path
+            &config.app_root_path
         };
 
         let app_state = AppState {
@@ -46,10 +46,10 @@ async fn main() {
         };
 
         let app = Router::new()
-            .merge(users::get_router(&root_path, app_state.clone()))
-            .merge(wishlists::get_router(&root_path, app_state.clone()))
-            .merge(items::get_router(&root_path, app_state))
-            .merge(health::get_router(&root_path));
+            .merge(users::get_router(root_path, app_state.clone()))
+            .merge(wishlists::get_router(root_path, app_state.clone()))
+            .merge(items::get_router(root_path, app_state))
+            .merge(health::get_router(root_path));
 
         let addr: SocketAddr = config
             .app_bind_address

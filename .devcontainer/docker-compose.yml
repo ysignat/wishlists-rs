@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker-host.sock
-      - ..:/workspace/wishlists:cached
-      - wishlists-vscode-extensions:/home/vscode/.vscode-server/extensions:rw
+      - ..:/workspace/wishlists-rs:cached
+      - wishlists-rs-vscode-extensions:/home/vscode/.vscode-server/extensions:rw
     entrypoint: /usr/local/share/docker-init.sh
     command: sleep infinity
   postgres:
@@ -17,4 +17,4 @@ services:
       POSTGRES_USER: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
 volumes:
-  wishlists-vscode-extensions: {}
+  wishlists-rs-vscode-extensions: {}

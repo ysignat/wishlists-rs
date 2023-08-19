@@ -13,6 +13,7 @@ members = [".", "./crates/migrations", "./crates/entities"]
 [dependencies]
 migrations = { path = "./crates/migrations" }
 entities = { path = "./crates/entities" }
+database = { path = "./crates/database" }
 axum = "0.6.18"
 serde = { version = "1.0.167", features = ["derive"] }
 tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"] }
@@ -20,11 +21,3 @@ uuid = { version = "1.4.0", features = ["v4", "serde"] }
 anyhow = "1.0.71"
 chrono = { version = "0.4.26", features = ["serde"] }
 clap = { version = "4.3.19", features = ["derive", "env"] }
-sea-orm = { version = "0.11.3", default-features = false, features = [
-  "chrono",
-  "macros",
-  "uuid",
-  "debug-print",
-  "runtime-tokio-rustls",
-  "sqlx-postgres",
-] }

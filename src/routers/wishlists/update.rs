@@ -4,8 +4,8 @@ use axum::{
     Json,
 };
 use chrono::{offset::Utc, NaiveDateTime};
-use entities::wishlists::{ActiveModel, Entity, Model};
-use sea_orm::{ActiveModelTrait, EntityTrait, Set};
+use database::structs::wishlists::update::DatabasePayload;
+use entities::wishlists::Model;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,7 +13,13 @@ use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
 pub struct Payload {
-    name: String,
+    pub name: String,
+}
+
+impl From<Payload> for DatabasePayload {
+    fn from(val: Payload) -> Self {
+        DatabasePayload { name: val.name }
+    }
 }
 
 #[derive(Serialize)]
@@ -44,18 +50,11 @@ pub async fn handler(
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
 
-    let mut active_model: ActiveModel = Entity::find_by_id(id)
-        .one(&state.database_connection)
-        .await?
+    let response = state
+        .repository
+        .update_wishlist(now, id, payload.into())
+        .await
         .unwrap()
-        .into();
-
-    active_model.name = Set(payload.name);
-    active_model.updated_at = Set(now);
-
-    let response = active_model
-        .update(&state.database_connection)
-        .await?
         .into();
 
     Ok((StatusCode::OK, Json(response)))

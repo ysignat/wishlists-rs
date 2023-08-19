@@ -6,9 +6,10 @@ mod utils;
 use axum::Server;
 use clap::Parser;
 use config::Config;
+use database::connection::get_db_connection;
 use migrations::{Migrator, MigratorTrait};
 use routers::Router;
-use utils::{get_bind_address, get_db_connection, get_root_path, get_state, AppState};
+use utils::{get_bind_address, get_root_path, get_state};
 
 #[tokio::main]
 async fn main() {
@@ -27,7 +28,7 @@ async fn main() {
             .expect("Migration not successful");
     } else {
         let root_path = get_root_path(&config.app_root_path);
-        let state = get_state(db_connection);
+        let state = get_state(&config).await;
         let bind_address = get_bind_address(&config.app_bind_address);
         let main_router = Router::new(root_path, state).build();
 

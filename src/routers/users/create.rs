@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use chrono::{offset::Utc, NaiveDateTime};
-use entities::users::{ActiveModel, Model};
-use sea_orm::{ActiveModelTrait, ActiveValue};
+use database::structs::users::create::DatabasePayload;
+use entities::users::Model;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -9,9 +9,19 @@ use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
 pub struct Payload {
-    first_name: Option<String>,
-    second_name: Option<String>,
-    nick_name: String,
+    pub first_name: Option<String>,
+    pub second_name: Option<String>,
+    pub nick_name: String,
+}
+
+impl From<Payload> for DatabasePayload {
+    fn from(val: Payload) -> Self {
+        DatabasePayload {
+            first_name: val.first_name,
+            second_name: val.second_name,
+            nick_name: val.nick_name,
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -42,18 +52,14 @@ pub async fn handler(
     Json(payload): Json<Payload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
+    let uuid = Uuid::new_v4();
 
-    let response = ActiveModel {
-        id: ActiveValue::Set(Uuid::new_v4()),
-        first_name: ActiveValue::Set(payload.first_name),
-        second_name: ActiveValue::Set(payload.second_name),
-        nick_name: ActiveValue::Set(payload.nick_name),
-        created_at: ActiveValue::Set(now),
-        updated_at: ActiveValue::Set(now),
-    }
-    .insert(&state.database_connection)
-    .await?
-    .into();
+    let response = state
+        .repository
+        .create_user(uuid, now, payload.into())
+        .await
+        .unwrap()
+        .into();
 
     Ok((StatusCode::CREATED, Json(response)))
 }

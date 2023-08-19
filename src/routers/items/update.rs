@@ -4,8 +4,8 @@ use axum::{
     Json,
 };
 use chrono::{offset::Utc, NaiveDateTime};
-use entities::items::{ActiveModel, Entity, Model};
-use sea_orm::{ActiveModelTrait, EntityTrait, Set};
+use database::structs::items::update::DatabasePayload;
+use entities::items::Model;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,10 +13,21 @@ use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
 pub struct Payload {
-    name: String,
-    description: Option<String>,
-    price: Option<i32>,
-    is_hidden: bool,
+    pub name: String,
+    pub description: Option<String>,
+    pub price: Option<i32>,
+    pub is_hidden: bool,
+}
+
+impl From<Payload> for DatabasePayload {
+    fn from(val: Payload) -> Self {
+        DatabasePayload {
+            name: val.name,
+            description: val.description,
+            price: val.price,
+            is_hidden: val.is_hidden,
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -55,21 +66,11 @@ pub async fn handler(
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
 
-    let mut active_model: ActiveModel = Entity::find_by_id(id)
-        .one(&state.database_connection)
-        .await?
+    let response = state
+        .repository
+        .update_item(now, id, payload.into())
+        .await
         .unwrap()
-        .into();
-
-    active_model.name = Set(payload.name);
-    active_model.description = Set(payload.description);
-    active_model.price = Set(payload.price);
-    active_model.is_hidden = Set(payload.is_hidden);
-    active_model.updated_at = Set(now);
-
-    let response = active_model
-        .update(&state.database_connection)
-        .await?
         .into();
 
     Ok((StatusCode::OK, Json(response)))

@@ -1,0 +1,27 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.71"
+async-trait = "0.1.73"
+chrono = { version = "0.4.26", features = ["serde"] }
+entities = { path = "../entities" }
+uuid = { version = "1.4.0", features = ["v4", "serde"] }
+sea-orm = { version = "0.11.3", default-features = false, features = [
+  "chrono",
+  "macros",
+  "uuid",
+  "debug-print",
+  "runtime-tokio-rustls",
+  "sqlx-postgres",
+] }
+serde = { version = "1.0.167", features = ["derive"] }
+
+
+[lib]
+name = "database"
+path = "src/lib.rs"

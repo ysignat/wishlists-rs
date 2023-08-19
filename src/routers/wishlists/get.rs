@@ -4,8 +4,7 @@ use axum::{
     Json,
 };
 use chrono::NaiveDateTime;
-use entities::wishlists::{Entity, Model};
-use sea_orm::EntityTrait;
+use entities::wishlists::Model;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -36,11 +35,7 @@ pub async fn handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let response = Entity::find_by_id(id)
-        .one(&state.database_connection)
-        .await?
-        .unwrap()
-        .into();
+    let response = state.repository.get_wishlist(id).await.unwrap().into();
 
     Ok((StatusCode::OK, Json(response)))
 }

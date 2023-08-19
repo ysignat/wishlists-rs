@@ -1,11 +1,11 @@
-mod health;
-mod items;
-mod users;
-mod wishlists;
+pub mod health;
+pub mod items;
+pub mod users;
+pub mod wishlists;
 
 use axum::Router as AxumRouter;
 
-use crate::AppState;
+use crate::utils::AppState;
 
 pub struct Router {
     root_path: String,

@@ -4,8 +4,8 @@ use axum::{
     Json,
 };
 use chrono::{offset::Utc, NaiveDateTime};
-use entities::users::{ActiveModel, Entity, Model};
-use sea_orm::{ActiveModelTrait, EntityTrait, Set};
+use database::structs::users::update::DatabasePayload;
+use entities::users::Model;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,8 +13,17 @@ use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
 pub struct Payload {
-    first_name: Option<String>,
-    second_name: Option<String>,
+    pub first_name: Option<String>,
+    pub second_name: Option<String>,
+}
+
+impl From<Payload> for DatabasePayload {
+    fn from(val: Payload) -> Self {
+        DatabasePayload {
+            first_name: val.first_name,
+            second_name: val.second_name,
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -47,19 +56,11 @@ pub async fn handler(
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
 
-    let mut active_model: ActiveModel = Entity::find_by_id(id)
-        .one(&state.database_connection)
-        .await?
+    let response = state
+        .repository
+        .update_user(now, id, payload.into())
+        .await
         .unwrap()
-        .into();
-
-    active_model.first_name = Set(payload.first_name);
-    active_model.second_name = Set(payload.second_name);
-    active_model.updated_at = Set(now);
-
-    let response = active_model
-        .update(&state.database_connection)
-        .await?
         .into();
 
     Ok((StatusCode::OK, Json(response)))

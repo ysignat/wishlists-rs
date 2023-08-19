@@ -1,7 +1,6 @@
 use axum::{extract::State, http::StatusCode, Json};
 use chrono::NaiveDateTime;
-use entities::items::{Entity, Model};
-use sea_orm::EntityTrait;
+use entities::items::Model;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -39,9 +38,11 @@ impl From<Model> for Response {
 pub async fn handler(
     State(state): State<AppState>,
 ) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
-    let response = Entity::find()
-        .all(&state.database_connection)
-        .await?
+    let response = state
+        .repository
+        .list_items()
+        .await
+        .unwrap()
         .into_iter()
         .map(std::convert::Into::into)
         .collect();

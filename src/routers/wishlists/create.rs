@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use chrono::{offset::Utc, NaiveDateTime};
-use entities::wishlists::{ActiveModel, Model};
-use sea_orm::{ActiveModelTrait, ActiveValue};
+use database::structs::wishlists::create::DatabasePayload;
+use entities::wishlists::Model;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -9,8 +9,17 @@ use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
 pub struct Payload {
-    name: String,
-    user_id: Uuid,
+    pub name: String,
+    pub user_id: Uuid,
+}
+
+impl From<Payload> for DatabasePayload {
+    fn from(val: Payload) -> Self {
+        DatabasePayload {
+            name: val.name,
+            user_id: val.user_id,
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -39,17 +48,14 @@ pub async fn handler(
     Json(payload): Json<Payload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
+    let uuid = Uuid::new_v4();
 
-    let response = ActiveModel {
-        id: ActiveValue::Set(Uuid::new_v4()),
-        user_id: ActiveValue::Set(payload.user_id),
-        name: ActiveValue::Set(payload.name),
-        created_at: ActiveValue::Set(now),
-        updated_at: ActiveValue::Set(now),
-    }
-    .insert(&state.database_connection)
-    .await?
-    .into();
+    let response = state
+        .repository
+        .create_wishlist(uuid, now, payload.into())
+        .await
+        .unwrap()
+        .into();
 
     Ok((StatusCode::CREATED, Json(response)))
 }

@@ -43,7 +43,7 @@ pub async fn handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let response = state.repository.get_item(id).await.unwrap().into();
+    let response = state.repository.get_item(id).await?.into();
 
     Ok((StatusCode::OK, Json(response)))
 }

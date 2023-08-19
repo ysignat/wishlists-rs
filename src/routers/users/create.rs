@@ -57,8 +57,7 @@ pub async fn handler(
     let response = state
         .repository
         .create_user(uuid, now, payload.into())
-        .await
-        .unwrap()
+        .await?
         .into();
 
     Ok((StatusCode::CREATED, Json(response)))

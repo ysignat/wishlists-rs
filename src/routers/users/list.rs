@@ -35,8 +35,7 @@ pub async fn handler(
     let response = state
         .repository
         .list_users()
-        .await
-        .unwrap()
+        .await?
         .into_iter()
         .map(std::convert::Into::into)
         .collect();

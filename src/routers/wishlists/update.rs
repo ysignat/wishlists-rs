@@ -53,8 +53,7 @@ pub async fn handler(
     let response = state
         .repository
         .update_wishlist(now, id, payload.into())
-        .await
-        .unwrap()
+        .await?
         .into();
 
     Ok((StatusCode::OK, Json(response)))

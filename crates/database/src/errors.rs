@@ -1,11 +1,7 @@
-#[derive(Debug)]
-pub struct DataError(anyhow::Error);
+use thiserror::Error;
 
-impl<E> From<E> for DataError
-where
-    E: Into<anyhow::Error>,
-{
-    fn from(err: E) -> Self {
-        Self(err.into())
-    }
+#[derive(Debug, Error)]
+pub enum DataError {
+    #[error("Unknown database error")]
+    Unknown,
 }

@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.71"
 async-trait = "0.1.73"
 chrono = { version = "0.4.26", features = ["serde"] }
 entities = { path = "../entities" }
@@ -20,6 +19,7 @@ sea-orm = { version = "0.11.3", default-features = false, features = [
   "sqlx-postgres",
 ] }
 serde = { version = "1.0.167", features = ["derive"] }
+thiserror = "1.0.47"
 
 
 [lib]

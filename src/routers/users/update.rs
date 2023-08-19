@@ -59,8 +59,7 @@ pub async fn handler(
     let response = state
         .repository
         .update_user(now, id, payload.into())
-        .await
-        .unwrap()
+        .await?
         .into();
 
     Ok((StatusCode::OK, Json(response)))

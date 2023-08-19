@@ -63,12 +63,10 @@ pub async fn handler(
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
     let uuid = Uuid::new_v4();
-
     let response = state
         .repository
         .create_item(uuid, now, payload.into())
-        .await
-        .unwrap()
+        .await?
         .into();
 
     Ok((StatusCode::CREATED, Json(response)))

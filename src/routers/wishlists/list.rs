@@ -33,8 +33,7 @@ pub async fn handler(
     let response = state
         .repository
         .list_wishlists()
-        .await
-        .unwrap()
+        .await?
         .into_iter()
         .map(std::convert::Into::into)
         .collect();

@@ -10,7 +10,7 @@ pub async fn handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {
-    state.repository.delete_item(id).await.unwrap();
+    state.repository.delete_item(id).await?;
 
     Ok((StatusCode::NO_CONTENT, "Object removed".to_owned()))
 }

@@ -4,11 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use database::{
-    connection::get_db_connection,
-    repository::Repository,
-    repository_trait::RepositoryTrait,
-};
+use database::{connection::Connection, repository::Repository, repository_trait::RepositoryTrait};
 
 use crate::config::Config;
 
@@ -53,17 +49,18 @@ pub fn get_root_path(root_path: &str) -> String {
     }
 }
 
-pub async fn get_state(config: &Config) -> AppState {
-    AppState {
+pub async fn get_state(config: &Config) -> Result<AppState, database::errors::DataError> {
+    Ok(AppState {
         repository: Arc::new(Repository {
-            database_connection: get_db_connection(
-                &config.postgres_url,
+            database_connection: Connection::new(
+                config.postgres_url.clone(),
                 config.postgres_pool_acquire_timeout,
                 config.postgres_pool_size,
             )
-            .await,
+            .connect()
+            .await?,
         }),
-    }
+    })
 }
 
 pub fn get_bind_address(bind_address: &str) -> SocketAddr {

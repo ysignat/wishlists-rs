@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 pub mod connection;
 pub mod errors;
 pub mod repository;

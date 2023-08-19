@@ -6,7 +6,7 @@ mod utils;
 use axum::Server;
 use clap::Parser;
 use config::Config;
-use database::connection::get_db_connection;
+use database::connection::Connection;
 use migrations::{Migrator, MigratorTrait};
 use routers::Router;
 use utils::{get_bind_address, get_root_path, get_state};
@@ -15,12 +15,14 @@ use utils::{get_bind_address, get_root_path, get_state};
 async fn main() {
     let config = Config::parse();
 
-    let db_connection = get_db_connection(
-        &config.postgres_url,
+    let db_connection = Connection::new(
+        config.postgres_url.clone(),
         config.postgres_pool_acquire_timeout,
         config.postgres_pool_size,
     )
-    .await;
+    .connect()
+    .await
+    .unwrap();
 
     if config.migrate {
         Migrator::up(&db_connection, None)
@@ -28,7 +30,7 @@ async fn main() {
             .expect("Migration not successful");
     } else {
         let root_path = get_root_path(&config.app_root_path);
-        let state = get_state(&config).await;
+        let state = get_state(&config).await.unwrap();
         let bind_address = get_bind_address(&config.app_bind_address);
         let main_router = Router::new(root_path, state).build();
 

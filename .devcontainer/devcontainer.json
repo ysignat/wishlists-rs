@@ -12,7 +12,10 @@
       "settings": {
         "lldb.executable": "/usr/bin/lldb",
         "terminal.integrated.defaultProfile.linux": "zsh",
-        "rust-analyzer.check.command": "clippy"
+        "rust-analyzer.check.command": "clippy",
+        "rust-analyzer.rustfmt.extraArgs": [
+          "+nightly"
+        ]
       },
       "extensions": [
         "usernamehw.errorlens",

@@ -12,15 +12,15 @@ use uuid::Uuid;
 use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
-pub struct Payload {
+pub struct HttpPayload {
     pub name: String,
     pub description: Option<String>,
     pub price: Option<i32>,
     pub is_hidden: bool,
 }
 
-impl From<Payload> for DatabasePayload {
-    fn from(val: Payload) -> Self {
+impl From<HttpPayload> for DatabasePayload {
+    fn from(val: HttpPayload) -> Self {
         DatabasePayload {
             name: val.name,
             description: val.description,
@@ -62,7 +62,7 @@ impl From<Model> for Response {
 pub async fn handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<Payload>,
+    Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
 

@@ -8,7 +8,7 @@ use uuid::Uuid;
 use crate::utils::{AppError, AppState};
 
 #[derive(Deserialize)]
-pub struct Payload {
+pub struct HttpPayload {
     pub wishlist_id: Uuid,
     pub name: String,
     pub description: Option<String>,
@@ -16,8 +16,8 @@ pub struct Payload {
     pub is_hidden: bool,
 }
 
-impl From<Payload> for DatabasePayload {
-    fn from(val: Payload) -> Self {
+impl From<HttpPayload> for DatabasePayload {
+    fn from(val: HttpPayload) -> Self {
         DatabasePayload {
             wishlist_id: val.wishlist_id,
             name: val.name,
@@ -59,7 +59,7 @@ impl From<Model> for Response {
 
 pub async fn handler(
     State(state): State<AppState>,
-    Json(payload): Json<Payload>,
+    Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let now = Utc::now().naive_utc();
     let uuid = Uuid::new_v4();

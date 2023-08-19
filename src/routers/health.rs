@@ -1,8 +1,11 @@
-use crate::utils::AppError;
 use axum::{http::StatusCode, Router};
 
+use crate::utils::AppError;
+
+static SUBPATH: &str = "/health";
+
 pub fn get_router(root_path: &str) -> Router {
-    Router::new().route(&format!("{root_path}/health"), axum::routing::get(health))
+    Router::new().route(&format!("{root_path}{SUBPATH}"), axum::routing::get(health))
 }
 
 #[allow(clippy::unused_async)]

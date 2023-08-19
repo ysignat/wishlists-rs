@@ -13,7 +13,7 @@ pub async fn handler(
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {
     let _ = Entity::delete_by_id(id)
-        .exec(&state.postgres_connection)
+        .exec(&state.database_connection)
         .await?;
 
     Ok((StatusCode::NO_CONTENT, "Object removed".to_owned()))

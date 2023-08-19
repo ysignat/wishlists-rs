@@ -56,7 +56,7 @@ pub async fn handler(
     let now = Utc::now().naive_utc();
 
     let mut active_model: ActiveModel = Entity::find_by_id(id)
-        .one(&state.postgres_connection)
+        .one(&state.database_connection)
         .await?
         .unwrap()
         .into();
@@ -68,7 +68,7 @@ pub async fn handler(
     active_model.updated_at = Set(now);
 
     let response = active_model
-        .update(&state.postgres_connection)
+        .update(&state.database_connection)
         .await?
         .into();
 

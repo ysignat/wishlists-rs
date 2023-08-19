@@ -37,7 +37,7 @@ pub async fn handler(
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = Entity::find_by_id(id)
-        .one(&state.postgres_connection)
+        .one(&state.database_connection)
         .await?
         .unwrap()
         .into();

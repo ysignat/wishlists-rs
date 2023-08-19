@@ -62,7 +62,7 @@ pub async fn handler(
         created_at: ActiveValue::Set(now),
         updated_at: ActiveValue::Set(now),
     }
-    .insert(&state.postgres_connection)
+    .insert(&state.database_connection)
     .await?
     .into();
 

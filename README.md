@@ -4,9 +4,9 @@
 
 - TODO: Database side validations
 - TODO: Server side validations
-- TODO: Database tests
 - TODO: Logging
-- TODO: API tests
+- TODO: API unit-tests
+- TODO: API end-to-end tests
 - TODO: SwaggerUI
 - TODO: Prometheus
 - TODO: Oauth2
@@ -20,3 +20,4 @@
 - TODO: Authorization
 - TODO: Cache kv storage
 - TODO: Error handling
+- TODO: Config

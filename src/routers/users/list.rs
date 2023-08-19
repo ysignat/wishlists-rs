@@ -34,7 +34,7 @@ pub async fn handler(
     State(state): State<AppState>,
 ) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
     let response = Entity::find()
-        .all(&state.postgres_connection)
+        .all(&state.database_connection)
         .await?
         .into_iter()
         .map(std::convert::Into::into)

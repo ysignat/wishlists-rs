@@ -1644,6 +1644,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "router"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "chrono",
+ "database",
+ "serde",
+ "uuid",
+]
+
+[[package]]
 name = "rsa"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2857,15 +2869,12 @@ checksum = "1a515f5799fe4961cb532f983ce2b23082366b898e52ffbce459c86f67c8378a"
 name = "wishlists"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "axum",
- "chrono",
  "clap",
  "database",
  "migrations",
- "serde",
+ "router",
  "tokio",
- "uuid",
 ]
 
 [[package]]

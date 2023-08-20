@@ -1,45 +1,9 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-};
-use database::{connection::Connection, repository::Repository, repository_trait::RepositoryTrait};
+use database::{connection::Connection, repository::Repository};
+use router::state::State;
 
 use crate::config::Config;
-
-pub struct AppError(anyhow::Error);
-
-impl IntoResponse for AppError {
-    fn into_response(self) -> Response {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Something went wrong: {}", self.0),
-        )
-            .into_response()
-    }
-}
-
-impl<E> From<E> for AppError
-where
-    E: Into<anyhow::Error>,
-{
-    fn from(err: E) -> Self {
-        Self(err.into())
-    }
-}
-
-pub struct AppState {
-    pub repository: Arc<dyn RepositoryTrait + Send + Sync>,
-}
-
-impl Clone for AppState {
-    fn clone(&self) -> Self {
-        AppState {
-            repository: self.repository.clone(),
-        }
-    }
-}
 
 pub fn get_root_path(root_path: &str) -> String {
     if root_path == "/" {
@@ -49,8 +13,8 @@ pub fn get_root_path(root_path: &str) -> String {
     }
 }
 
-pub async fn get_state(config: &Config) -> Result<AppState, database::errors::DataError> {
-    Ok(AppState {
+pub async fn get_state(config: &Config) -> Result<State, database::errors::DataError> {
+    Ok(State {
         repository: Arc::new(Repository {
             database_connection: Connection::new(
                 config.postgres_url.clone(),

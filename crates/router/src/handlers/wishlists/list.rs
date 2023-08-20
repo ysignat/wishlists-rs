@@ -1,13 +1,13 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{extract::State as AxumState, http::StatusCode, Json};
 use chrono::NaiveDateTime;
 use database::structs::wishlists::list::DatabaseResponse;
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::utils::{AppError, AppState};
+use crate::{errors::AppError, state::State};
 
 #[derive(Serialize)]
-pub struct Response {
+pub struct HttpResponse {
     id: Uuid,
     name: String,
     user_id: Uuid,
@@ -15,9 +15,9 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<DatabaseResponse> for Response {
+impl From<DatabaseResponse> for HttpResponse {
     fn from(value: DatabaseResponse) -> Self {
-        Response {
+        HttpResponse {
             id: value.id,
             name: value.name,
             user_id: value.user_id,
@@ -28,8 +28,8 @@ impl From<DatabaseResponse> for Response {
 }
 
 pub async fn handler(
-    State(state): State<AppState>,
-) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
+    AxumState(state): AxumState<State>,
+) -> Result<(StatusCode, Json<Vec<HttpResponse>>), AppError> {
     let response = state
         .repository
         .list_wishlists()

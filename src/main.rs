@@ -1,6 +1,5 @@
 #![warn(clippy::pedantic)]
 mod config;
-mod routers;
 mod utils;
 
 use axum::Server;
@@ -8,7 +7,7 @@ use clap::Parser;
 use config::Config;
 use database::connection::Connection;
 use migrations::{Migrator, MigratorTrait};
-use routers::Router;
+use router::Router;
 use utils::{get_bind_address, get_root_path, get_state};
 
 #[tokio::main]

@@ -1,19 +1,20 @@
-pub mod health;
-pub mod items;
-pub mod users;
-pub mod wishlists;
-
+#![warn(clippy::pedantic)]
 use axum::Router as AxumRouter;
+use handlers::{health, items, users, wishlists};
+use state::State;
 
-use crate::utils::AppState;
+pub mod errors;
+mod handlers;
+pub mod state;
 
 pub struct Router {
     root_path: String,
-    state: AppState,
+    state: State,
 }
 
 impl Router {
-    pub fn new(root_path: String, state: AppState) -> Router {
+    #[must_use]
+    pub fn new(root_path: String, state: State) -> Router {
         Router { root_path, state }
     }
 

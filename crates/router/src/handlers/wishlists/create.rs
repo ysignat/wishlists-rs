@@ -1,28 +1,29 @@
-use axum::{
-    extract::{Path, State},
-    http::StatusCode,
-    Json,
-};
+use axum::{extract::State as AxumState, http::StatusCode, Json};
 use chrono::NaiveDateTime;
-use database::structs::wishlists::update::{DatabasePayload, DatabaseResponse};
+use database::structs::wishlists::create::{DatabasePayload, DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::utils::{AppError, AppState};
+use crate::{errors::AppError, state::State};
 
 #[derive(Deserialize)]
 pub struct HttpPayload {
-    pub name: String,
+    name: String,
+    user_id: Uuid,
 }
 
 impl From<HttpPayload> for DatabasePayload {
     fn from(val: HttpPayload) -> Self {
-        DatabasePayload { name: val.name }
+        DatabasePayload {
+            id: Uuid::new_v4(),
+            name: val.name,
+            user_id: val.user_id,
+        }
     }
 }
 
 #[derive(Serialize)]
-pub struct Response {
+pub struct HttpResponse {
     id: Uuid,
     name: String,
     user_id: Uuid,
@@ -30,9 +31,9 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<DatabaseResponse> for Response {
+impl From<DatabaseResponse> for HttpResponse {
     fn from(value: DatabaseResponse) -> Self {
-        Response {
+        HttpResponse {
             id: value.id,
             name: value.name,
             user_id: value.user_id,
@@ -43,15 +44,14 @@ impl From<DatabaseResponse> for Response {
 }
 
 pub async fn handler(
-    State(state): State<AppState>,
-    Path(id): Path<Uuid>,
+    AxumState(state): AxumState<State>,
     Json(payload): Json<HttpPayload>,
-) -> Result<(StatusCode, Json<Response>), AppError> {
+) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
     let response = state
         .repository
-        .update_wishlist(id, payload.into())
+        .create_wishlist(payload.into())
         .await?
         .into();
 
-    Ok((StatusCode::OK, Json(response)))
+    Ok((StatusCode::CREATED, Json(response)))
 }

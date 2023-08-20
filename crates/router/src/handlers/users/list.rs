@@ -1,13 +1,13 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{extract::State as AxumState, http::StatusCode, Json};
 use chrono::NaiveDateTime;
 use database::structs::users::list::DatabaseResponse;
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::utils::{AppError, AppState};
+use crate::{errors::AppError, state::State};
 
 #[derive(Serialize)]
-pub struct Response {
+pub struct HttpResponse {
     id: Uuid,
     first_name: Option<String>,
     second_name: Option<String>,
@@ -16,9 +16,9 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<DatabaseResponse> for Response {
+impl From<DatabaseResponse> for HttpResponse {
     fn from(value: DatabaseResponse) -> Self {
-        Response {
+        HttpResponse {
             id: value.id,
             first_name: value.first_name,
             second_name: value.second_name,
@@ -30,8 +30,8 @@ impl From<DatabaseResponse> for Response {
 }
 
 pub async fn handler(
-    State(state): State<AppState>,
-) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
+    AxumState(state): AxumState<State>,
+) -> Result<(StatusCode, Json<Vec<HttpResponse>>), AppError> {
     let response = state
         .repository
         .list_users()

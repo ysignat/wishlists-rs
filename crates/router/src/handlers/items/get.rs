@@ -1,13 +1,17 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{
+    extract::{Path, State as AxumState},
+    http::StatusCode,
+    Json,
+};
 use chrono::NaiveDateTime;
-use database::structs::items::list::DatabaseResponse;
+use database::structs::items::get::DatabaseResponse;
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::utils::{AppError, AppState};
+use crate::{errors::AppError, state::State};
 
 #[derive(Serialize)]
-pub struct Response {
+pub struct HttpResponse {
     id: Uuid,
     wishlist_id: Uuid,
     selected_by_id: Option<Uuid>,
@@ -19,9 +23,9 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<DatabaseResponse> for Response {
+impl From<DatabaseResponse> for HttpResponse {
     fn from(value: DatabaseResponse) -> Self {
-        Response {
+        HttpResponse {
             id: value.id,
             wishlist_id: value.wishlist_id,
             selected_by_id: value.selected_by_id,
@@ -36,15 +40,10 @@ impl From<DatabaseResponse> for Response {
 }
 
 pub async fn handler(
-    State(state): State<AppState>,
-) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
-    let response = state
-        .repository
-        .list_items()
-        .await?
-        .into_iter()
-        .map(std::convert::Into::into)
-        .collect();
+    AxumState(state): AxumState<State>,
+    Path(id): Path<Uuid>,
+) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    let response = state.repository.get_item(id).await?.into();
 
     Ok((StatusCode::OK, Json(response)))
 }

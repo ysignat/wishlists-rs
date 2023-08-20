@@ -1,5 +1,5 @@
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State as AxumState},
     http::StatusCode,
     Json,
 };
@@ -8,13 +8,13 @@ use database::structs::users::update::{DatabasePayload, DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::utils::{AppError, AppState};
+use crate::{errors::AppError, state::State};
 
 #[derive(Deserialize)]
 pub struct HttpPayload {
-    pub first_name: Option<String>,
-    pub second_name: Option<String>,
-    pub nick_name: String,
+    first_name: Option<String>,
+    second_name: Option<String>,
+    nick_name: String,
 }
 
 impl From<HttpPayload> for DatabasePayload {
@@ -28,7 +28,7 @@ impl From<HttpPayload> for DatabasePayload {
 }
 
 #[derive(Serialize)]
-pub struct Response {
+pub struct HttpResponse {
     id: Uuid,
     first_name: Option<String>,
     second_name: Option<String>,
@@ -37,9 +37,9 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<DatabaseResponse> for Response {
+impl From<DatabaseResponse> for HttpResponse {
     fn from(value: DatabaseResponse) -> Self {
-        Response {
+        HttpResponse {
             id: value.id,
             first_name: value.first_name,
             second_name: value.second_name,
@@ -51,10 +51,10 @@ impl From<DatabaseResponse> for Response {
 }
 
 pub async fn handler(
-    State(state): State<AppState>,
+    AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
     Json(payload): Json<HttpPayload>,
-) -> Result<(StatusCode, Json<Response>), AppError> {
+) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
     let response = state
         .repository
         .update_user(id, payload.into())

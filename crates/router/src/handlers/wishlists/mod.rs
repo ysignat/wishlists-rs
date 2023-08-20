@@ -1,16 +1,16 @@
 use axum::Router;
 
-use crate::utils::AppState;
+use crate::state::State;
 
-pub mod create;
-pub mod delete;
-pub mod get;
-pub mod list;
-pub mod update;
+mod create;
+mod delete;
+mod get;
+mod list;
+mod update;
 
-static SUBPATH: &str = "/users";
+static SUBPATH: &str = "/wishlists";
 
-pub fn get_router(root_path: &str, state: AppState) -> Router {
+pub fn get_router(root_path: &str, state: State) -> Router {
     Router::new()
         .route(
             &format!("{root_path}{SUBPATH}"),

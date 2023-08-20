@@ -13,9 +13,7 @@ sea-orm = { version = "0.12.2", default-features = false, features = [
   "debug-print",
   "runtime-tokio-rustls",
   "sqlx-postgres",
-  "with-json",
 ] }
-serde = { version = "1.0.167", features = ["derive"] }
 
 [lib]
 name = "entities"

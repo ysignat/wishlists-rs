@@ -5,8 +5,7 @@ mod utils;
 use axum::Server;
 use clap::Parser;
 use config::Config;
-use database::connection::Connection;
-use migrations::{Migrator, MigratorTrait};
+use database::{connection::Connection, migrate};
 use router::Router;
 use utils::{get_bind_address, get_root_path, get_state};
 
@@ -21,10 +20,10 @@ async fn main() {
     )
     .connect()
     .await
-    .unwrap();
+    .expect("Cannot create connection pool");
 
     if config.migrate {
-        Migrator::up(&db_connection, None)
+        migrate(&db_connection)
             .await
             .expect("Migration not successful");
     } else {

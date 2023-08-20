@@ -17,7 +17,6 @@ members = [
 ]
 
 [dependencies]
-migrations = { path = "./crates/migrations" }
 database = { path = "./crates/database" }
 router = { path = "./crates/router" }
 axum = "0.6.18"

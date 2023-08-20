@@ -443,7 +443,7 @@ dependencies = [
  "js-sys",
  "num-traits",
  "serde",
- "time 0.1.45",
+ "time",
  "wasm-bindgen",
  "winapi",
 ]
@@ -576,6 +576,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "entities",
+ "migrations",
  "sea-orm",
  "serde",
  "thiserror",
@@ -591,15 +592,6 @@ dependencies = [
  "const-oid",
  "pem-rfc7468",
  "zeroize",
-]
-
-[[package]]
-name = "deranged"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7684a49fb1af197853ef7b2ee694bc1f5b4179556f1e5710e1760c5db6f5e929"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -645,7 +637,6 @@ name = "entities"
 version = "0.1.0"
 dependencies = [
  "sea-orm",
- "serde",
 ]
 
 [[package]]
@@ -1797,11 +1788,9 @@ dependencies = [
  "sea-query",
  "sea-query-binder",
  "serde",
- "serde_json",
  "sqlx",
  "strum",
  "thiserror",
- "time 0.3.24",
  "tracing",
  "url",
  "uuid",
@@ -1866,7 +1855,6 @@ dependencies = [
  "inherent",
  "ordered-float",
  "sea-query-derive",
- "serde_json",
  "uuid",
 ]
 
@@ -1878,7 +1866,6 @@ checksum = "36bbb68df92e820e4d5aeb17b4acd5cc8b5d18b2c36a4dd6f4626aabfa7ab1b9"
 dependencies = [
  "chrono",
  "sea-query",
- "serde_json",
  "sqlx",
  "uuid",
 ]
@@ -2397,33 +2384,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "time"
-version = "0.3.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b79eabcd964882a646b3584543ccabeae7869e9ac32a46f6f22b7a5bd405308b"
-dependencies = [
- "deranged",
- "serde",
- "time-core",
- "time-macros",
-]
-
-[[package]]
-name = "time-core"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7300fbefb4dadc1af235a9cef3737cea692a9d97e1b9cbcd4ebdae6f8868e6fb"
-
-[[package]]
-name = "time-macros"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb71511c991639bb078fd5bf97757e03914361c48100d52878b8e52b46fb92cd"
-dependencies = [
- "time-core",
-]
-
-[[package]]
 name = "tinyvec"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2872,7 +2832,6 @@ dependencies = [
  "axum",
  "clap",
  "database",
- "migrations",
  "router",
  "tokio",
 ]

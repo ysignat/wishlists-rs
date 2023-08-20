@@ -1,17 +1,7 @@
 use chrono::NaiveDateTime;
 use entities::items::Model;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use uuid::Uuid;
-
-#[derive(Deserialize)]
-pub struct DatabasePayload {
-    pub id: Uuid,
-    pub wishlist_id: Uuid,
-    pub name: String,
-    pub description: Option<String>,
-    pub price: Option<i32>,
-    pub is_hidden: bool,
-}
 
 #[derive(Serialize)]
 pub struct DatabaseResponse {

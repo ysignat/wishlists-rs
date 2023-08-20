@@ -21,4 +21,3 @@
 - TODO: Cache kv storage
 - TODO: Error handling
 - TODO: Config
-- TODO: Specific types for database responses

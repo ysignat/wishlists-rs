@@ -11,53 +11,53 @@ pub trait RepositoryTrait {
     async fn create_item(
         &self,
         payload: items::create::DatabasePayload,
-    ) -> Result<entities::items::Model, DataError>;
+    ) -> Result<items::create::DatabaseResponse, DataError>;
 
     async fn delete_item(&self, id: Uuid) -> Result<(), DataError>;
 
-    async fn get_item(&self, id: Uuid) -> Result<entities::items::Model, DataError>;
+    async fn get_item(&self, id: Uuid) -> Result<items::get::DatabaseResponse, DataError>;
 
-    async fn list_items(&self) -> Result<Vec<entities::items::Model>, DataError>;
+    async fn list_items(&self) -> Result<Vec<items::list::DatabaseResponse>, DataError>;
 
     async fn update_item(
         &self,
         id: Uuid,
         payload: items::update::DatabasePayload,
-    ) -> Result<entities::items::Model, DataError>;
+    ) -> Result<items::update::DatabaseResponse, DataError>;
 
     async fn create_user(
         &self,
         payload: users::create::DatabasePayload,
-    ) -> Result<entities::users::Model, DataError>;
+    ) -> Result<users::create::DatabaseResponse, DataError>;
 
     async fn delete_user(&self, id: Uuid) -> Result<(), DataError>;
 
-    async fn get_user(&self, id: Uuid) -> Result<entities::users::Model, DataError>;
+    async fn get_user(&self, id: Uuid) -> Result<users::get::DatabaseResponse, DataError>;
 
-    async fn list_users(&self) -> Result<Vec<entities::users::Model>, DataError>;
+    async fn list_users(&self) -> Result<Vec<users::list::DatabaseResponse>, DataError>;
 
     async fn update_user(
         &self,
         id: Uuid,
         payload: users::update::DatabasePayload,
-    ) -> Result<entities::users::Model, DataError>;
+    ) -> Result<users::update::DatabaseResponse, DataError>;
 
     async fn create_wishlist(
         &self,
         payload: wishlists::create::DatabasePayload,
-    ) -> Result<entities::wishlists::Model, DataError>;
+    ) -> Result<wishlists::create::DatabaseResponse, DataError>;
 
     async fn delete_wishlist(&self, id: Uuid) -> Result<(), DataError>;
 
-    async fn get_wishlist(&self, id: Uuid) -> Result<entities::wishlists::Model, DataError>;
+    async fn get_wishlist(&self, id: Uuid) -> Result<wishlists::get::DatabaseResponse, DataError>;
 
-    async fn list_wishlists(&self) -> Result<Vec<entities::wishlists::Model>, DataError>;
+    async fn list_wishlists(&self) -> Result<Vec<wishlists::list::DatabaseResponse>, DataError>;
 
     async fn update_wishlist(
         &self,
         id: Uuid,
         payload: wishlists::update::DatabasePayload,
-    ) -> Result<entities::wishlists::Model, DataError>;
+    ) -> Result<wishlists::update::DatabaseResponse, DataError>;
 
     async fn healthcheck(&self) -> Result<(), DataError>;
 }

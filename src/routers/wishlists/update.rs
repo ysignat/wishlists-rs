@@ -4,8 +4,7 @@ use axum::{
     Json,
 };
 use chrono::NaiveDateTime;
-use database::structs::wishlists::update::DatabasePayload;
-use entities::wishlists::Model;
+use database::structs::wishlists::update::{DatabasePayload, DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -31,8 +30,8 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<Model> for Response {
-    fn from(value: Model) -> Self {
+impl From<DatabaseResponse> for Response {
+    fn from(value: DatabaseResponse) -> Self {
         Response {
             id: value.id,
             name: value.name,

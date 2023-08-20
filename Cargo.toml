@@ -12,7 +12,6 @@ members = [".", "./crates/migrations", "./crates/entities"]
 
 [dependencies]
 migrations = { path = "./crates/migrations" }
-entities = { path = "./crates/entities" }
 database = { path = "./crates/database" }
 axum = "0.6.18"
 serde = { version = "1.0.167", features = ["derive"] }

@@ -2862,7 +2862,6 @@ dependencies = [
  "chrono",
  "clap",
  "database",
- "entities",
  "migrations",
  "serde",
  "tokio",

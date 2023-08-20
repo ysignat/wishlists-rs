@@ -4,7 +4,7 @@ use axum::{
     Json,
 };
 use chrono::NaiveDateTime;
-use entities::users::Model;
+use database::structs::users::get::DatabaseResponse;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -20,8 +20,8 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<Model> for Response {
-    fn from(value: Model) -> Self {
+impl From<DatabaseResponse> for Response {
+    fn from(value: DatabaseResponse) -> Self {
         Response {
             id: value.id,
             first_name: value.first_name,

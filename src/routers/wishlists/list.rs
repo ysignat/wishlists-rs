@@ -1,6 +1,6 @@
 use axum::{extract::State, http::StatusCode, Json};
 use chrono::NaiveDateTime;
-use entities::wishlists::Model;
+use database::structs::wishlists::list::DatabaseResponse;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -15,8 +15,8 @@ pub struct Response {
     updated_at: NaiveDateTime,
 }
 
-impl From<Model> for Response {
-    fn from(value: Model) -> Self {
+impl From<DatabaseResponse> for Response {
+    fn from(value: DatabaseResponse) -> Self {
         Response {
             id: value.id,
             name: value.name,

@@ -27,7 +27,7 @@ impl RepositoryTrait for Repository {
     async fn create_item(
         &self,
         payload: items::create::DatabasePayload,
-    ) -> Result<entities::items::Model, DataError> {
+    ) -> Result<items::create::DatabaseResponse, DataError> {
         let now = Utc::now().naive_utc();
 
         entities::items::ActiveModel {
@@ -43,44 +43,44 @@ impl RepositoryTrait for Repository {
         }
         .insert(&self.database_connection)
         .await
+        .map(std::convert::Into::into)
         .or(Err(DataError::Unknown))
     }
 
     async fn delete_item(&self, id: Uuid) -> Result<(), DataError> {
-        match entities::items::Entity::delete_by_id(id)
+        entities::items::Entity::delete_by_id(id)
             .exec(&self.database_connection)
             .await
-        {
-            Ok(_) => Ok(()),
-            Err(_) => Err(DataError::Unknown),
-        }
+            .map(|_| ())
+            .or(Err(DataError::Unknown))
     }
 
-    async fn get_item(&self, id: Uuid) -> Result<entities::items::Model, DataError> {
+    async fn get_item(&self, id: Uuid) -> Result<items::get::DatabaseResponse, DataError> {
         match entities::items::Entity::find_by_id(id)
             .one(&self.database_connection)
             .await
         {
             Ok(database_response) => match database_response {
-                Some(response) => Ok(response),
+                Some(response) => Ok(response.into()),
                 None => Err(DataError::Unknown),
             },
             Err(_) => Err(DataError::Unknown),
         }
     }
 
-    async fn list_items(&self) -> Result<Vec<entities::items::Model>, DataError> {
+    async fn list_items(&self) -> Result<Vec<items::list::DatabaseResponse>, DataError> {
         entities::items::Entity::find()
             .all(&self.database_connection)
             .await
             .or(Err(DataError::Unknown))
+            .map(|x| x.into_iter().map(std::convert::Into::into).collect())
     }
 
     async fn update_item(
         &self,
         id: Uuid,
         payload: items::update::DatabasePayload,
-    ) -> Result<entities::items::Model, DataError> {
+    ) -> Result<items::update::DatabaseResponse, DataError> {
         let now = Utc::now().naive_utc();
 
         let active_model = entities::items::ActiveModel {
@@ -96,13 +96,14 @@ impl RepositoryTrait for Repository {
             .filter(entities::items::Column::Id.eq(id))
             .exec(&self.database_connection)
             .await
+            .map(std::convert::Into::into)
             .or(Err(DataError::Unknown))
     }
 
     async fn create_user(
         &self,
         payload: users::create::DatabasePayload,
-    ) -> Result<entities::users::Model, DataError> {
+    ) -> Result<users::create::DatabaseResponse, DataError> {
         let now = Utc::now().naive_utc();
 
         entities::users::ActiveModel {
@@ -115,44 +116,44 @@ impl RepositoryTrait for Repository {
         }
         .insert(&self.database_connection)
         .await
+        .map(std::convert::Into::into)
         .or(Err(DataError::Unknown))
     }
 
     async fn delete_user(&self, id: Uuid) -> Result<(), DataError> {
-        match entities::users::Entity::delete_by_id(id)
+        entities::users::Entity::delete_by_id(id)
             .exec(&self.database_connection)
             .await
-        {
-            Ok(_) => Ok(()),
-            Err(_) => Err(DataError::Unknown),
-        }
+            .map(|_| ())
+            .or(Err(DataError::Unknown))
     }
 
-    async fn get_user(&self, id: Uuid) -> Result<entities::users::Model, DataError> {
+    async fn get_user(&self, id: Uuid) -> Result<users::get::DatabaseResponse, DataError> {
         match entities::users::Entity::find_by_id(id)
             .one(&self.database_connection)
             .await
         {
             Ok(database_response) => match database_response {
-                Some(response) => Ok(response),
+                Some(response) => Ok(response.into()),
                 None => Err(DataError::Unknown),
             },
             Err(_) => Err(DataError::Unknown),
         }
     }
 
-    async fn list_users(&self) -> Result<Vec<entities::users::Model>, DataError> {
+    async fn list_users(&self) -> Result<Vec<users::list::DatabaseResponse>, DataError> {
         entities::users::Entity::find()
             .all(&self.database_connection)
             .await
             .or(Err(DataError::Unknown))
+            .map(|x| x.into_iter().map(std::convert::Into::into).collect())
     }
 
     async fn update_user(
         &self,
         id: Uuid,
         payload: users::update::DatabasePayload,
-    ) -> Result<entities::users::Model, DataError> {
+    ) -> Result<users::update::DatabaseResponse, DataError> {
         let now = Utc::now().naive_utc();
 
         let active_model = entities::users::ActiveModel {
@@ -167,13 +168,14 @@ impl RepositoryTrait for Repository {
             .filter(entities::users::Column::Id.eq(id))
             .exec(&self.database_connection)
             .await
+            .map(std::convert::Into::into)
             .or(Err(DataError::Unknown))
     }
 
     async fn create_wishlist(
         &self,
         payload: wishlists::create::DatabasePayload,
-    ) -> Result<entities::wishlists::Model, DataError> {
+    ) -> Result<wishlists::create::DatabaseResponse, DataError> {
         let now = Utc::now().naive_utc();
 
         entities::wishlists::ActiveModel {
@@ -185,44 +187,44 @@ impl RepositoryTrait for Repository {
         }
         .insert(&self.database_connection)
         .await
+        .map(std::convert::Into::into)
         .or(Err(DataError::Unknown))
     }
 
     async fn delete_wishlist(&self, id: Uuid) -> Result<(), DataError> {
-        match entities::wishlists::Entity::delete_by_id(id)
+        entities::wishlists::Entity::delete_by_id(id)
             .exec(&self.database_connection)
             .await
-        {
-            Ok(_) => Ok(()),
-            Err(_) => Err(DataError::Unknown),
-        }
+            .map(|_| ())
+            .or(Err(DataError::Unknown))
     }
 
-    async fn get_wishlist(&self, id: Uuid) -> Result<entities::wishlists::Model, DataError> {
+    async fn get_wishlist(&self, id: Uuid) -> Result<wishlists::get::DatabaseResponse, DataError> {
         match entities::wishlists::Entity::find_by_id(id)
             .one(&self.database_connection)
             .await
         {
             Ok(database_response) => match database_response {
-                Some(response) => Ok(response),
+                Some(response) => Ok(response.into()),
                 None => Err(DataError::Unknown),
             },
             Err(_) => Err(DataError::Unknown),
         }
     }
 
-    async fn list_wishlists(&self) -> Result<Vec<entities::wishlists::Model>, DataError> {
+    async fn list_wishlists(&self) -> Result<Vec<wishlists::list::DatabaseResponse>, DataError> {
         entities::wishlists::Entity::find()
             .all(&self.database_connection)
             .await
             .or(Err(DataError::Unknown))
+            .map(|x| x.into_iter().map(std::convert::Into::into).collect())
     }
 
     async fn update_wishlist(
         &self,
         id: Uuid,
         payload: wishlists::update::DatabasePayload,
-    ) -> Result<entities::wishlists::Model, DataError> {
+    ) -> Result<wishlists::update::DatabaseResponse, DataError> {
         let now = Utc::now().naive_utc();
         let active_model = entities::wishlists::ActiveModel {
             name: Set(payload.name),
@@ -234,17 +236,15 @@ impl RepositoryTrait for Repository {
             .filter(entities::wishlists::Column::Id.eq(id))
             .exec(&self.database_connection)
             .await
+            .map(std::convert::Into::into)
             .or(Err(DataError::Unknown))
     }
 
     async fn healthcheck(&self) -> Result<(), DataError> {
-        match self
-            .database_connection
+        self.database_connection
             .execute_unprepared("SELECT 1;")
             .await
-        {
-            Ok(_) => Ok(()),
-            Err(_) => Err(DataError::Unknown),
-        }
+            .map(|_| ())
+            .or(Err(DataError::Unknown))
     }
 }

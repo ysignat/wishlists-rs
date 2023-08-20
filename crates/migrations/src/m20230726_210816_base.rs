@@ -15,7 +15,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Users::SecondName).string_len(100))
                     .col(
                         ColumnDef::new(Users::NickName)
-                            .text()
+                            .string_len(100)
                             .unique_key()
                             .not_null(),
                     )

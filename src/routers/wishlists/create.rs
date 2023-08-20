@@ -16,6 +16,7 @@ pub struct HttpPayload {
 impl From<HttpPayload> for DatabasePayload {
     fn from(val: HttpPayload) -> Self {
         DatabasePayload {
+            id: Uuid::new_v4(),
             name: val.name,
             user_id: val.user_id,
         }
@@ -47,11 +48,9 @@ pub async fn handler(
     State(state): State<AppState>,
     Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let uuid = Uuid::new_v4();
-
     let response = state
         .repository
-        .create_wishlist(uuid, payload.into())
+        .create_wishlist(payload.into())
         .await?
         .into();
 

@@ -17,13 +17,12 @@ pub struct Repository {
 impl RepositoryTrait for Repository {
     async fn create_item(
         &self,
-        uuid: Uuid,
         payload: items::create::DatabasePayload,
     ) -> Result<entities::items::Model, DataError> {
         let now = Utc::now().naive_utc();
 
         entities::items::ActiveModel {
-            id: ActiveValue::Set(uuid),
+            id: ActiveValue::Set(payload.id),
             wishlist_id: ActiveValue::Set(payload.wishlist_id),
             selected_by_id: ActiveValue::Set(None),
             name: ActiveValue::Set(payload.name),
@@ -102,13 +101,12 @@ impl RepositoryTrait for Repository {
 
     async fn create_user(
         &self,
-        uuid: Uuid,
         payload: users::create::DatabasePayload,
     ) -> Result<entities::users::Model, DataError> {
         let now = Utc::now().naive_utc();
 
         entities::users::ActiveModel {
-            id: ActiveValue::Set(uuid),
+            id: ActiveValue::Set(payload.id),
             first_name: ActiveValue::Set(payload.first_name),
             second_name: ActiveValue::Set(payload.second_name),
             nick_name: ActiveValue::Set(payload.nick_name),
@@ -182,13 +180,12 @@ impl RepositoryTrait for Repository {
 
     async fn create_wishlist(
         &self,
-        uuid: Uuid,
         payload: wishlists::create::DatabasePayload,
     ) -> Result<entities::wishlists::Model, DataError> {
         let now = Utc::now().naive_utc();
 
         entities::wishlists::ActiveModel {
-            id: ActiveValue::Set(uuid),
+            id: ActiveValue::Set(payload.id),
             user_id: ActiveValue::Set(payload.user_id),
             name: ActiveValue::Set(payload.name),
             created_at: ActiveValue::Set(now),

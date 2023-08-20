@@ -3,6 +3,7 @@ use uuid::Uuid;
 
 #[derive(Deserialize)]
 pub struct DatabasePayload {
+    pub id: Uuid,
     pub wishlist_id: Uuid,
     pub name: String,
     pub description: Option<String>,

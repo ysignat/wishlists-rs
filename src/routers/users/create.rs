@@ -17,6 +17,7 @@ pub struct HttpPayload {
 impl From<HttpPayload> for DatabasePayload {
     fn from(val: HttpPayload) -> Self {
         DatabasePayload {
+            id: Uuid::new_v4(),
             first_name: val.first_name,
             second_name: val.second_name,
             nick_name: val.nick_name,
@@ -51,13 +52,7 @@ pub async fn handler(
     State(state): State<AppState>,
     Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let uuid = Uuid::new_v4();
-
-    let response = state
-        .repository
-        .create_user(uuid, payload.into())
-        .await?
-        .into();
+    let response = state.repository.create_user(payload.into()).await?.into();
 
     Ok((StatusCode::CREATED, Json(response)))
 }

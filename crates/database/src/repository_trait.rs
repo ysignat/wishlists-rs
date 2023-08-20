@@ -10,7 +10,6 @@ use super::{
 pub trait RepositoryTrait {
     async fn create_item(
         &self,
-        uuid: Uuid,
         payload: items::create::DatabasePayload,
     ) -> Result<entities::items::Model, DataError>;
 
@@ -28,7 +27,6 @@ pub trait RepositoryTrait {
 
     async fn create_user(
         &self,
-        uuid: Uuid,
         payload: users::create::DatabasePayload,
     ) -> Result<entities::users::Model, DataError>;
 
@@ -46,7 +44,6 @@ pub trait RepositoryTrait {
 
     async fn create_wishlist(
         &self,
-        uuid: Uuid,
         payload: wishlists::create::DatabasePayload,
     ) -> Result<entities::wishlists::Model, DataError>;
 

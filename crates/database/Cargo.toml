@@ -16,7 +16,7 @@ sea-orm = { version = "0.12.2", default-features = false, features = [
   "macros",
   "uuid",
   "debug-print",
-  "runtime-tokio-rustls",
+  "runtime-tokio",
   "sqlx-postgres",
 ] }
 serde = { version = "1.0.167", features = ["derive"] }

@@ -15,6 +15,7 @@ use crate::utils::{AppError, AppState};
 pub struct HttpPayload {
     pub first_name: Option<String>,
     pub second_name: Option<String>,
+    pub nick_name: String,
 }
 
 impl From<HttpPayload> for DatabasePayload {
@@ -22,6 +23,7 @@ impl From<HttpPayload> for DatabasePayload {
         DatabasePayload {
             first_name: val.first_name,
             second_name: val.second_name,
+            nick_name: val.nick_name,
         }
     }
 }

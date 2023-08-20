@@ -157,6 +157,7 @@ impl RepositoryTrait for Repository {
         let active_model = entities::users::ActiveModel {
             first_name: Set(payload.first_name),
             second_name: Set(payload.second_name),
+            nick_name: Set(payload.nick_name),
             updated_at: Set(now),
             ..Default::default()
         };

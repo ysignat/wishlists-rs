@@ -58,4 +58,6 @@ pub trait RepositoryTrait {
         id: Uuid,
         payload: wishlists::update::DatabasePayload,
     ) -> Result<entities::wishlists::Model, DataError>;
+
+    async fn healthcheck(&self) -> Result<(), DataError>;
 }

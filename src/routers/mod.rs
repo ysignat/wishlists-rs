@@ -22,6 +22,6 @@ impl Router {
             .merge(users::get_router(&self.root_path, self.state.clone()))
             .merge(wishlists::get_router(&self.root_path, self.state.clone()))
             .merge(items::get_router(&self.root_path, self.state.clone()))
-            .merge(health::get_router(&self.root_path))
+            .merge(health::get_router(&self.root_path, self.state.clone()))
     }
 }

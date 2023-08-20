@@ -21,5 +21,4 @@
 - TODO: Cache kv storage
 - TODO: Error handling
 - TODO: Config
-- TODO: Improve healthcheck, add database connection check
 - TODO: Specific types for database responses

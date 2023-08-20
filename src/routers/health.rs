@@ -1,14 +1,20 @@
-use axum::{http::StatusCode, Router};
+use axum::{extract::State, http::StatusCode, Router};
 
-use crate::utils::AppError;
+use crate::utils::AppState;
 
 static SUBPATH: &str = "/health";
 
-pub fn get_router(root_path: &str) -> Router {
-    Router::new().route(&format!("{root_path}{SUBPATH}"), axum::routing::get(health))
+pub fn get_router(root_path: &str, state: AppState) -> Router {
+    Router::new().route(
+        &format!("{root_path}{SUBPATH}"),
+        axum::routing::get(healthcheck).with_state(state),
+    )
 }
 
 #[allow(clippy::unused_async)]
-async fn health() -> Result<(StatusCode, String), AppError> {
-    Ok((StatusCode::OK, "Healthy!".to_owned()))
+async fn healthcheck(State(state): State<AppState>) -> StatusCode {
+    match state.repository.healthcheck().await {
+        Ok(_) => StatusCode::OK,
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    }
 }

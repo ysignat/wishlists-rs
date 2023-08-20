@@ -4,6 +4,7 @@ use sea_orm::{
     ActiveModelTrait,
     ActiveValue,
     ColumnTrait,
+    ConnectionTrait,
     DatabaseConnection,
     EntityTrait,
     QueryFilter,
@@ -234,5 +235,16 @@ impl RepositoryTrait for Repository {
             .exec(&self.database_connection)
             .await
             .or(Err(DataError::Unknown))
+    }
+
+    async fn healthcheck(&self) -> Result<(), DataError> {
+        match self
+            .database_connection
+            .execute_unprepared("SELECT 1;")
+            .await
+        {
+            Ok(_) => Ok(()),
+            Err(_) => Err(DataError::Unknown),
+        }
     }
 }

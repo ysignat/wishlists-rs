@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use chrono::{offset::Utc, NaiveDateTime};
+use chrono::NaiveDateTime;
 use database::structs::wishlists::update::DatabasePayload;
 use entities::wishlists::Model;
 use serde::{Deserialize, Serialize};
@@ -48,11 +48,9 @@ pub async fn handler(
     Path(id): Path<Uuid>,
     Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let now = Utc::now().naive_utc();
-
     let response = state
         .repository
-        .update_wishlist(now, id, payload.into())
+        .update_wishlist(id, payload.into())
         .await?
         .into();
 

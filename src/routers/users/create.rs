@@ -1,5 +1,5 @@
 use axum::{extract::State, http::StatusCode, Json};
-use chrono::{offset::Utc, NaiveDateTime};
+use chrono::NaiveDateTime;
 use database::structs::users::create::DatabasePayload;
 use entities::users::Model;
 use serde::{Deserialize, Serialize};
@@ -51,12 +51,11 @@ pub async fn handler(
     State(state): State<AppState>,
     Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let now = Utc::now().naive_utc();
     let uuid = Uuid::new_v4();
 
     let response = state
         .repository
-        .create_user(uuid, now, payload.into())
+        .create_user(uuid, payload.into())
         .await?
         .into();
 

@@ -1,5 +1,5 @@
 use axum::{extract::State, http::StatusCode, Json};
-use chrono::{offset::Utc, NaiveDateTime};
+use chrono::NaiveDateTime;
 use database::structs::wishlists::create::DatabasePayload;
 use entities::wishlists::Model;
 use serde::{Deserialize, Serialize};
@@ -47,12 +47,11 @@ pub async fn handler(
     State(state): State<AppState>,
     Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let now = Utc::now().naive_utc();
     let uuid = Uuid::new_v4();
 
     let response = state
         .repository
-        .create_wishlist(uuid, now, payload.into())
+        .create_wishlist(uuid, payload.into())
         .await?
         .into();
 

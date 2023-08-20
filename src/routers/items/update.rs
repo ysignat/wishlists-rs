@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use chrono::{offset::Utc, NaiveDateTime};
+use chrono::NaiveDateTime;
 use database::structs::items::update::DatabasePayload;
 use entities::items::Model;
 use serde::{Deserialize, Serialize};
@@ -64,11 +64,9 @@ pub async fn handler(
     Path(id): Path<Uuid>,
     Json(payload): Json<HttpPayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let now = Utc::now().naive_utc();
-
     let response = state
         .repository
-        .update_item(now, id, payload.into())
+        .update_item(id, payload.into())
         .await?
         .into();
 

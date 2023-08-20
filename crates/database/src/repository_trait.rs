@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use chrono::NaiveDateTime;
 use uuid::Uuid;
 
 use super::{
@@ -12,7 +11,6 @@ pub trait RepositoryTrait {
     async fn create_item(
         &self,
         uuid: Uuid,
-        timestamp: NaiveDateTime,
         payload: items::create::DatabasePayload,
     ) -> Result<entities::items::Model, DataError>;
 
@@ -24,7 +22,6 @@ pub trait RepositoryTrait {
 
     async fn update_item(
         &self,
-        timestamp: NaiveDateTime,
         id: Uuid,
         payload: items::update::DatabasePayload,
     ) -> Result<entities::items::Model, DataError>;
@@ -32,7 +29,6 @@ pub trait RepositoryTrait {
     async fn create_user(
         &self,
         uuid: Uuid,
-        timestamp: NaiveDateTime,
         payload: users::create::DatabasePayload,
     ) -> Result<entities::users::Model, DataError>;
 
@@ -44,7 +40,6 @@ pub trait RepositoryTrait {
 
     async fn update_user(
         &self,
-        timestamp: NaiveDateTime,
         id: Uuid,
         payload: users::update::DatabasePayload,
     ) -> Result<entities::users::Model, DataError>;
@@ -52,7 +47,6 @@ pub trait RepositoryTrait {
     async fn create_wishlist(
         &self,
         uuid: Uuid,
-        timestamp: NaiveDateTime,
         payload: wishlists::create::DatabasePayload,
     ) -> Result<entities::wishlists::Model, DataError>;
 
@@ -64,7 +58,6 @@ pub trait RepositoryTrait {
 
     async fn update_wishlist(
         &self,
-        timestamp: NaiveDateTime,
         id: Uuid,
         payload: wishlists::update::DatabasePayload,
     ) -> Result<entities::wishlists::Model, DataError>;

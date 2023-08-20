@@ -23,5 +23,3 @@
 - TODO: Config
 - TODO: Improve healthcheck, add database connection check
 - TODO: Specific types for database responses
-- TODO: Try to embed migrations and entities into database layer
- 

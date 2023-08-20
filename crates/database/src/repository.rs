@@ -1,6 +1,14 @@
 use async_trait::async_trait;
 use chrono::Utc;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, Set};
+use sea_orm::{
+    ActiveModelTrait,
+    ActiveValue,
+    ColumnTrait,
+    DatabaseConnection,
+    EntityTrait,
+    QueryFilter,
+    Set,
+};
 use uuid::Uuid;
 
 use super::{
@@ -74,29 +82,20 @@ impl RepositoryTrait for Repository {
     ) -> Result<entities::items::Model, DataError> {
         let now = Utc::now().naive_utc();
 
-        match entities::items::Entity::find_by_id(id)
-            .one(&self.database_connection)
+        let active_model = entities::items::ActiveModel {
+            name: Set(payload.name),
+            description: Set(payload.description),
+            price: Set(payload.price),
+            is_hidden: Set(payload.is_hidden),
+            updated_at: Set(now),
+            ..Default::default()
+        };
+
+        entities::items::Entity::update(active_model)
+            .filter(entities::items::Column::Id.eq(id))
+            .exec(&self.database_connection)
             .await
-        {
-            Ok(database_response) => match database_response {
-                Some(response) => {
-                    let mut active_model: entities::items::ActiveModel = response.into();
-
-                    active_model.name = Set(payload.name);
-                    active_model.description = Set(payload.description);
-                    active_model.price = Set(payload.price);
-                    active_model.is_hidden = Set(payload.is_hidden);
-                    active_model.updated_at = Set(now);
-
-                    active_model
-                        .update(&self.database_connection)
-                        .await
-                        .or(Err(DataError::Unknown))
-                }
-                None => Err(DataError::Unknown),
-            },
-            Err(_) => Err(DataError::Unknown),
-        }
+            .or(Err(DataError::Unknown))
     }
 
     async fn create_user(
@@ -155,27 +154,18 @@ impl RepositoryTrait for Repository {
     ) -> Result<entities::users::Model, DataError> {
         let now = Utc::now().naive_utc();
 
-        match entities::users::Entity::find_by_id(id)
-            .one(&self.database_connection)
+        let active_model = entities::users::ActiveModel {
+            first_name: Set(payload.first_name),
+            second_name: Set(payload.second_name),
+            updated_at: Set(now),
+            ..Default::default()
+        };
+
+        entities::users::Entity::update(active_model)
+            .filter(entities::users::Column::Id.eq(id))
+            .exec(&self.database_connection)
             .await
-        {
-            Ok(database_response) => match database_response {
-                Some(response) => {
-                    let mut active_model: entities::users::ActiveModel = response.into();
-
-                    active_model.first_name = Set(payload.first_name);
-                    active_model.second_name = Set(payload.second_name);
-                    active_model.updated_at = Set(now);
-
-                    active_model
-                        .update(&self.database_connection)
-                        .await
-                        .or(Err(DataError::Unknown))
-                }
-                None => Err(DataError::Unknown),
-            },
-            Err(_) => Err(DataError::Unknown),
-        }
+            .or(Err(DataError::Unknown))
     }
 
     async fn create_wishlist(
@@ -232,26 +222,16 @@ impl RepositoryTrait for Repository {
         payload: wishlists::update::DatabasePayload,
     ) -> Result<entities::wishlists::Model, DataError> {
         let now = Utc::now().naive_utc();
+        let active_model = entities::wishlists::ActiveModel {
+            name: Set(payload.name),
+            updated_at: Set(now),
+            ..Default::default()
+        };
 
-        match entities::wishlists::Entity::find_by_id(id)
-            .one(&self.database_connection)
+        entities::wishlists::Entity::update(active_model)
+            .filter(entities::wishlists::Column::Id.eq(id))
+            .exec(&self.database_connection)
             .await
-        {
-            Ok(database_response) => match database_response {
-                Some(response) => {
-                    let mut active_model: entities::wishlists::ActiveModel = response.into();
-
-                    active_model.name = Set(payload.name);
-                    active_model.updated_at = Set(now);
-
-                    active_model
-                        .update(&self.database_connection)
-                        .await
-                        .or(Err(DataError::Unknown))
-                }
-                None => Err(DataError::Unknown),
-            },
-            Err(_) => Err(DataError::Unknown),
-        }
+            .or(Err(DataError::Unknown))
     }
 }

@@ -12,7 +12,6 @@
 - TODO: Oauth2
 - TODO: CI
 - TODO: Helm Chart
-- TODO: Distroless docker image (scratch)
 - TODO: Minimize deps
 - TODO: Debugging
 - TODO: Friends API
@@ -21,3 +20,4 @@
 - TODO: Cache kv storage
 - TODO: Error handling
 - TODO: Config
+- TODO: Trait for database CRUD

@@ -21,20 +21,9 @@ RUN \
   --profile release \
   --target x86_64-unknown-linux-musl
 
-FROM alpine:${ALPINE_VERSION} as release
+FROM scratch
 
 ARG CARGO_INSTALL_ROOT
-ARG USER="user"
-ARG HOME="/app"
-ARG UID="1000"
-ARG GID="1000"
+COPY --from=build "${CARGO_INSTALL_ROOT}/bin/app" "/app"
 
-RUN \
-  addgroup --gid "${GID}" "${USER}" \
-  && adduser --disabled-password --gecos "" --home "${HOME}" --ingroup "${USER}" --uid "${UID}" "${USER}"
-
-COPY --from=build "${CARGO_INSTALL_ROOT}/bin/app" "/bin/app"
-
-USER "${USER}"
-WORKDIR "${HOME}"
-ENTRYPOINT [ "/bin/app" ]
+ENTRYPOINT [ "/app" ]

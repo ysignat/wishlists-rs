@@ -9,7 +9,7 @@ pub struct Model {
     pub id: Uuid,
     pub first_name: Option<String>,
     pub second_name: Option<String>,
-    #[sea_orm(column_type = "Text", unique)]
+    #[sea_orm(unique)]
     pub nick_name: String,
     pub created_at: DateTime,
     pub updated_at: DateTime,

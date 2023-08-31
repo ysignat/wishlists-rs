@@ -4,6 +4,7 @@ use migrations::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;
 
 pub mod connection;
+mod crud;
 pub mod errors;
 pub mod repository;
 pub mod repository_trait;

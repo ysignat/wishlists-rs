@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 
-use crate::errors::DataError;
+use crate::DataError;
 
 pub struct Connection {
     url: String,

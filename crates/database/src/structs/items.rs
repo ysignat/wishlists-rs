@@ -6,59 +6,45 @@ use sea_orm::{
     ActiveValue,
     ColumnTrait,
     DatabaseConnection,
+    DbErr,
     EntityTrait,
-    PrimaryKeyTrait,
     QueryFilter,
     Set,
 };
+use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::structs::items;
+use crate::EntityCrud;
 
-#[async_trait]
-trait Crud<T, U, V, W>
-where
-    T: EntityTrait,
-    U: Into<<T::PrimaryKey as PrimaryKeyTrait>::ValueType> + Send + 'static,
-{
-    fn get_database_connection(&self) -> &DatabaseConnection;
-
-    async fn create_item(&self, payload: V) -> T::Model;
-
-    async fn get(&self, id: U) -> T::Model {
-        let database_connection = self.get_database_connection();
-        T::find_by_id(id)
-            .one(database_connection)
-            .await
-            .unwrap()
-            .unwrap()
-    }
-
-    async fn delete(&self, id: U) {
-        let database_connection = self.get_database_connection();
-        T::delete_by_id(id).exec(database_connection).await.unwrap();
-    }
-
-    async fn list(&self) -> Vec<T::Model> {
-        T::find().all(self.get_database_connection()).await.unwrap()
-    }
-
-    async fn update_item(&self, id: U, payload: W) -> T::Model;
+#[derive(Deserialize)]
+pub struct CreatePayload {
+    pub id: Uuid,
+    pub wishlist_id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub price: Option<i32>,
+    pub is_hidden: bool,
 }
 
-struct ItemsCrud {
-    database_connection: DatabaseConnection,
+#[derive(Deserialize)]
+pub struct UpdatePayload {
+    pub name: String,
+    pub description: Option<String>,
+    pub price: Option<i32>,
+    pub is_hidden: bool,
+}
+
+struct ItemsCrud<'a> {
+    database_connection: &'a DatabaseConnection,
 }
 
 #[async_trait]
-impl Crud<Entity, Uuid, items::create::DatabasePayload, items::update::DatabasePayload>
-    for ItemsCrud
-{
+impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for ItemsCrud<'_> {
     fn get_database_connection(&self) -> &DatabaseConnection {
-        &self.database_connection
+        self.database_connection
     }
 
-    async fn create_item(&self, payload: items::create::DatabasePayload) -> Model {
+    async fn create(&self, payload: CreatePayload) -> Result<Model, DbErr> {
         let now = Utc::now().naive_utc();
 
         entities::items::ActiveModel {
@@ -74,10 +60,9 @@ impl Crud<Entity, Uuid, items::create::DatabasePayload, items::update::DatabaseP
         }
         .insert(self.get_database_connection())
         .await
-        .unwrap()
     }
 
-    async fn update_item(&self, id: Uuid, payload: items::update::DatabasePayload) -> Model {
+    async fn update(&self, id: Uuid, payload: UpdatePayload) -> Result<Model, DbErr> {
         let now = Utc::now().naive_utc();
 
         let active_model = entities::items::ActiveModel {
@@ -91,8 +76,7 @@ impl Crud<Entity, Uuid, items::create::DatabasePayload, items::update::DatabaseP
 
         entities::items::Entity::update(active_model)
             .filter(entities::items::Column::Id.eq(id))
-            .exec(&self.database_connection)
+            .exec(self.database_connection)
             .await
-            .unwrap()
     }
 }

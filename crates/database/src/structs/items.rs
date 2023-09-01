@@ -34,12 +34,12 @@ pub struct UpdatePayload {
     pub is_hidden: bool,
 }
 
-struct ItemsCrud<'a> {
-    database_connection: &'a DatabaseConnection,
+pub struct Crud<'a> {
+    pub database_connection: &'a DatabaseConnection,
 }
 
 #[async_trait]
-impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for ItemsCrud<'_> {
+impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for Crud<'_> {
     fn get_database_connection(&self) -> &DatabaseConnection {
         self.database_connection
     }
@@ -58,7 +58,7 @@ impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for ItemsCrud<'_> {
             created_at: ActiveValue::Set(now),
             updated_at: ActiveValue::Set(now),
         }
-        .insert(self.get_database_connection())
+        .insert(self.database_connection)
         .await
     }
 

@@ -31,12 +31,12 @@ pub struct UpdatePayload {
     pub nick_name: String,
 }
 
-struct UsersCrud<'a> {
-    database_connection: &'a DatabaseConnection,
+pub struct Crud<'a> {
+    pub database_connection: &'a DatabaseConnection,
 }
 
 #[async_trait]
-impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for UsersCrud<'_> {
+impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for Crud<'_> {
     fn get_database_connection(&self) -> &DatabaseConnection {
         self.database_connection
     }

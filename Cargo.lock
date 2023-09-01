@@ -1642,6 +1642,7 @@ dependencies = [
  "axum",
  "chrono",
  "database",
+ "entities",
  "serde",
  "uuid",
 ]

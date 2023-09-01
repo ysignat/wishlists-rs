@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
 use entities::users::{Entity, Model};
 use sea_orm::{
     ActiveModelTrait,
@@ -14,10 +14,10 @@ use sea_orm::{
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::EntityCrud;
+use super::EntityCrudTrait;
 
 #[derive(Deserialize)]
-pub struct CreatePayload {
+pub struct DatabaseCreatePayload {
     pub id: Uuid,
     pub first_name: Option<String>,
     pub second_name: Option<String>,
@@ -25,23 +25,47 @@ pub struct CreatePayload {
 }
 
 #[derive(Deserialize)]
-pub struct UpdatePayload {
+pub struct DatabaseUpdatePayload {
     pub first_name: Option<String>,
     pub second_name: Option<String>,
     pub nick_name: String,
 }
 
-pub struct Crud<'a> {
+pub struct DatabaseResponse {
+    pub id: Uuid,
+    pub first_name: Option<String>,
+    pub second_name: Option<String>,
+    pub nick_name: String,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<Model> for DatabaseResponse {
+    fn from(value: Model) -> Self {
+        DatabaseResponse {
+            id: value.id,
+            first_name: value.first_name,
+            second_name: value.second_name,
+            nick_name: value.nick_name,
+            created_at: value.created_at,
+            updated_at: value.updated_at,
+        }
+    }
+}
+
+pub struct EntityCrud<'a> {
     pub database_connection: &'a DatabaseConnection,
 }
 
 #[async_trait]
-impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for Crud<'_> {
+impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload, DatabaseResponse>
+    for EntityCrud<'_>
+{
     fn get_database_connection(&self) -> &DatabaseConnection {
         self.database_connection
     }
 
-    async fn create(&self, payload: CreatePayload) -> Result<Model, DbErr> {
+    async fn create(&self, payload: DatabaseCreatePayload) -> Result<DatabaseResponse, DbErr> {
         let now = Utc::now().naive_utc();
 
         entities::users::ActiveModel {
@@ -54,9 +78,14 @@ impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for Crud<'_> {
         }
         .insert(self.database_connection)
         .await
+        .map(std::convert::Into::into)
     }
 
-    async fn update(&self, id: Uuid, payload: UpdatePayload) -> Result<Model, DbErr> {
+    async fn update(
+        &self,
+        id: Uuid,
+        payload: DatabaseUpdatePayload,
+    ) -> Result<DatabaseResponse, DbErr> {
         let now = Utc::now().naive_utc();
 
         let active_model = entities::users::ActiveModel {
@@ -71,5 +100,6 @@ impl EntityCrud<Entity, Uuid, CreatePayload, UpdatePayload> for Crud<'_> {
             .filter(entities::users::Column::Id.eq(id))
             .exec(self.database_connection)
             .await
+            .map(std::convert::Into::into)
     }
 }

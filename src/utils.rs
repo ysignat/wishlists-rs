@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use database::{connection::Connection, DatabaseRepository};
+use database::{connection::Connection, repository::DatabaseRepository};
 use router::state::State;
 
 use crate::config::Config;

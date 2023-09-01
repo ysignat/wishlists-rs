@@ -5,7 +5,7 @@ use axum::{
     Router,
 };
 use chrono::NaiveDateTime;
-use database::structs::items::{CreatePayload, UpdatePayload};
+use database::crud::items::{DatabaseCreatePayload, DatabaseUpdatePayload};
 use entities::items::Model;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -21,9 +21,9 @@ pub struct CreateHttpPayload {
     is_hidden: bool,
 }
 
-impl From<CreateHttpPayload> for CreatePayload {
+impl From<CreateHttpPayload> for DatabaseCreatePayload {
     fn from(val: CreateHttpPayload) -> Self {
-        CreatePayload {
+        DatabaseCreatePayload {
             id: Uuid::new_v4(),
             wishlist_id: val.wishlist_id,
             name: val.name,
@@ -42,9 +42,9 @@ pub struct UpdateHttpPayload {
     is_hidden: bool,
 }
 
-impl From<UpdateHttpPayload> for UpdatePayload {
+impl From<UpdateHttpPayload> for DatabaseUpdatePayload {
     fn from(val: UpdateHttpPayload) -> Self {
-        UpdatePayload {
+        DatabaseUpdatePayload {
             name: val.name,
             description: val.description,
             price: val.price,

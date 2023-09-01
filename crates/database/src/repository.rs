@@ -1,6 +1,6 @@
 #![warn(clippy::pedantic)]
 use async_trait::async_trait;
-use sea_orm::{DatabaseConnection, DbErr};
+use sea_orm::{ConnectionTrait, DatabaseConnection, DbErr};
 use uuid::Uuid;
 
 use crate::crud::{items, users, wishlists, EntityCrudTrait};
@@ -210,6 +210,9 @@ impl DatabaseRepositoryTrait for DatabaseRepository {
     }
 
     async fn healthcheck(&self) -> Result<(), DbErr> {
-        todo!()
+        self.database_connection
+            .execute_unprepared("SELECT 1;")
+            .await
+            .map(|_| ())
     }
 }

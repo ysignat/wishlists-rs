@@ -5,21 +5,20 @@ use axum::{
     Router,
 };
 use chrono::NaiveDateTime;
-use database::crud::wishlists::{DatabaseCreatePayload, DatabaseUpdatePayload};
-use entities::wishlists::Model;
+use database::crud::wishlists::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{errors::AppError, state::State};
 
 #[derive(Deserialize)]
-pub struct CreateHttpPayload {
+pub struct HttpCreatePayload {
     name: String,
     user_id: Uuid,
 }
 
-impl From<CreateHttpPayload> for DatabaseCreatePayload {
-    fn from(val: CreateHttpPayload) -> Self {
+impl From<HttpCreatePayload> for DatabaseCreatePayload {
+    fn from(val: HttpCreatePayload) -> Self {
         DatabaseCreatePayload {
             id: Uuid::new_v4(),
             name: val.name,
@@ -29,12 +28,12 @@ impl From<CreateHttpPayload> for DatabaseCreatePayload {
 }
 
 #[derive(Deserialize)]
-pub struct UpdateHttpPayload {
+pub struct HttpUpdatePayload {
     name: String,
 }
 
-impl From<UpdateHttpPayload> for DatabaseUpdatePayload {
-    fn from(val: UpdateHttpPayload) -> Self {
+impl From<HttpUpdatePayload> for DatabaseUpdatePayload {
+    fn from(val: HttpUpdatePayload) -> Self {
         DatabaseUpdatePayload { name: val.name }
     }
 }
@@ -48,8 +47,8 @@ pub struct HttpResponse {
     updated_at: NaiveDateTime,
 }
 
-impl From<Model> for HttpResponse {
-    fn from(value: Model) -> Self {
+impl From<DatabaseResponse> for HttpResponse {
+    fn from(value: DatabaseResponse) -> Self {
         HttpResponse {
             id: value.id,
             name: value.name,
@@ -76,7 +75,7 @@ pub async fn list(
 
 pub async fn create(
     AxumState(state): AxumState<State>,
-    Json(payload): Json<CreateHttpPayload>,
+    Json(payload): Json<HttpCreatePayload>,
 ) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
     let response = state
         .repository
@@ -103,7 +102,7 @@ pub async fn get(
 pub async fn update(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<UpdateHttpPayload>,
+    Json(payload): Json<HttpUpdatePayload>,
 ) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
     let response = state
         .repository

@@ -5,22 +5,21 @@ use axum::{
     Router,
 };
 use chrono::NaiveDateTime;
-use database::crud::users::{DatabaseCreatePayload, DatabaseUpdatePayload};
-use entities::users::Model;
+use database::crud::users::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{errors::AppError, state::State};
 
 #[derive(Deserialize)]
-pub struct CreateHttpPayload {
+pub struct HttpCreatePayload {
     first_name: Option<String>,
     second_name: Option<String>,
     nick_name: String,
 }
 
-impl From<CreateHttpPayload> for DatabaseCreatePayload {
-    fn from(val: CreateHttpPayload) -> Self {
+impl From<HttpCreatePayload> for DatabaseCreatePayload {
+    fn from(val: HttpCreatePayload) -> Self {
         DatabaseCreatePayload {
             id: Uuid::new_v4(),
             first_name: val.first_name,
@@ -31,14 +30,14 @@ impl From<CreateHttpPayload> for DatabaseCreatePayload {
 }
 
 #[derive(Deserialize)]
-pub struct UpdateHttpPayload {
+pub struct HttpUpdatePayload {
     first_name: Option<String>,
     second_name: Option<String>,
     nick_name: String,
 }
 
-impl From<UpdateHttpPayload> for DatabaseUpdatePayload {
-    fn from(val: UpdateHttpPayload) -> Self {
+impl From<HttpUpdatePayload> for DatabaseUpdatePayload {
+    fn from(val: HttpUpdatePayload) -> Self {
         DatabaseUpdatePayload {
             first_name: val.first_name,
             second_name: val.second_name,
@@ -57,8 +56,8 @@ pub struct HttpResponse {
     updated_at: NaiveDateTime,
 }
 
-impl From<Model> for HttpResponse {
-    fn from(value: Model) -> Self {
+impl From<DatabaseResponse> for HttpResponse {
+    fn from(value: DatabaseResponse) -> Self {
         HttpResponse {
             id: value.id,
             first_name: value.first_name,
@@ -72,7 +71,7 @@ impl From<Model> for HttpResponse {
 
 pub async fn create(
     AxumState(state): AxumState<State>,
-    Json(payload): Json<CreateHttpPayload>,
+    Json(payload): Json<HttpCreatePayload>,
 ) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
     let response = state.repository.create_user(payload.into()).await?.into();
 
@@ -109,7 +108,7 @@ pub async fn get(
 pub async fn update(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<UpdateHttpPayload>,
+    Json(payload): Json<HttpUpdatePayload>,
 ) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
     let response = state
         .repository

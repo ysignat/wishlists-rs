@@ -1,13 +1,11 @@
 #![warn(clippy::pedantic)]
-use errors::DataError;
 use migrations::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;
+use thiserror::Error;
 
 pub mod connection;
-pub mod errors;
+pub mod crud;
 pub mod repository;
-pub mod repository_trait;
-pub mod structs;
 
 /// # Errors
 ///
@@ -16,4 +14,10 @@ pub async fn migrate(connection: &DatabaseConnection) -> Result<(), DataError> {
     Migrator::up(connection, None)
         .await
         .or(Err(DataError::Unknown))
+}
+
+#[derive(Debug, Error)]
+pub enum DataError {
+    #[error("Unknown database error")]
+    Unknown,
 }

@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use database::{connection::Connection, repository::Repository};
+use database::{connection::Connection, repository::DatabaseRepository};
 use router::state::State;
 
 use crate::config::Config;
@@ -13,9 +13,9 @@ pub fn get_root_path(root_path: &str) -> String {
     }
 }
 
-pub async fn get_state(config: &Config) -> Result<State, database::errors::DataError> {
+pub async fn get_state(config: &Config) -> Result<State, database::DataError> {
     Ok(State {
-        repository: Arc::new(Repository {
+        repository: Arc::new(DatabaseRepository {
             database_connection: Connection::new(
                 config.postgres_url.clone(),
                 config.postgres_pool_acquire_timeout,

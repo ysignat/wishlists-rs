@@ -14,7 +14,7 @@ RUN \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/man /usr/share/doc /usr/share/doc-base
 
 # Rust
-ARG RUST_VERSION="1.71.0"
+ARG RUST_VERSION="1.72.0"
 RUN rustup toolchain uninstall $(rustup toolchain list)
 
 USER vscode

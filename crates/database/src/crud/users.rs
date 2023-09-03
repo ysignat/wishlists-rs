@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use entities::users::{Entity, Model};
 use sea_orm::{
     ActiveModelTrait,
@@ -22,6 +22,7 @@ pub struct DatabaseCreatePayload {
     pub first_name: Option<String>,
     pub second_name: Option<String>,
     pub nick_name: String,
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Deserialize)]
@@ -29,6 +30,7 @@ pub struct DatabaseUpdatePayload {
     pub first_name: Option<String>,
     pub second_name: Option<String>,
     pub nick_name: String,
+    pub updated_at: NaiveDateTime,
 }
 
 pub struct DatabaseResponse {
@@ -66,15 +68,13 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
     }
 
     async fn create(&self, payload: DatabaseCreatePayload) -> Result<DatabaseResponse, DbErr> {
-        let now = Utc::now().naive_utc();
-
         entities::users::ActiveModel {
             id: ActiveValue::Set(payload.id),
             first_name: ActiveValue::Set(payload.first_name),
             second_name: ActiveValue::Set(payload.second_name),
             nick_name: ActiveValue::Set(payload.nick_name),
-            created_at: ActiveValue::Set(now),
-            updated_at: ActiveValue::Set(now),
+            created_at: ActiveValue::Set(payload.created_at),
+            updated_at: ActiveValue::Set(payload.created_at),
         }
         .insert(self.database_connection)
         .await
@@ -86,13 +86,11 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
         id: Uuid,
         payload: DatabaseUpdatePayload,
     ) -> Result<DatabaseResponse, DbErr> {
-        let now = Utc::now().naive_utc();
-
         let active_model = entities::users::ActiveModel {
             first_name: Set(payload.first_name),
             second_name: Set(payload.second_name),
             nick_name: Set(payload.nick_name),
-            updated_at: Set(now),
+            updated_at: Set(payload.updated_at),
             ..Default::default()
         };
 

@@ -20,4 +20,3 @@
 - TODO: Cache kv storage
 - TODO: Error handling
 - TODO: Config
-- TODO: Trait for database CRUD

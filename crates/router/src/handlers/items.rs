@@ -4,7 +4,7 @@ use axum::{
     Json,
     Router,
 };
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
 use database::crud::items::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -29,6 +29,7 @@ impl From<HttpCreatePayload> for DatabaseCreatePayload {
             description: val.description,
             price: val.price,
             is_hidden: val.is_hidden,
+            created_at: Utc::now().naive_utc(),
         }
     }
 }
@@ -48,6 +49,7 @@ impl From<HttpUpdatePayload> for DatabaseUpdatePayload {
             description: val.description,
             price: val.price,
             is_hidden: val.is_hidden,
+            updated_at: Utc::now().naive_utc(),
         }
     }
 }

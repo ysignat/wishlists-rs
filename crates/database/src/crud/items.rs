@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use entities::items::{Entity, Model};
 use sea_orm::{
     ActiveModelTrait,
@@ -24,6 +24,7 @@ pub struct DatabaseCreatePayload {
     pub description: Option<String>,
     pub price: Option<i32>,
     pub is_hidden: bool,
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Deserialize)]
@@ -32,6 +33,7 @@ pub struct DatabaseUpdatePayload {
     pub description: Option<String>,
     pub price: Option<i32>,
     pub is_hidden: bool,
+    pub updated_at: NaiveDateTime,
 }
 
 pub struct DatabaseResponse {
@@ -75,8 +77,6 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
     }
 
     async fn create(&self, payload: DatabaseCreatePayload) -> Result<DatabaseResponse, DbErr> {
-        let now = Utc::now().naive_utc();
-
         entities::items::ActiveModel {
             id: ActiveValue::Set(payload.id),
             wishlist_id: ActiveValue::Set(payload.wishlist_id),
@@ -85,8 +85,8 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
             description: ActiveValue::Set(payload.description),
             price: ActiveValue::Set(payload.price),
             is_hidden: ActiveValue::Set(payload.is_hidden),
-            created_at: ActiveValue::Set(now),
-            updated_at: ActiveValue::Set(now),
+            created_at: ActiveValue::Set(payload.created_at),
+            updated_at: ActiveValue::Set(payload.created_at),
         }
         .insert(self.database_connection)
         .await
@@ -98,14 +98,12 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
         id: Uuid,
         payload: DatabaseUpdatePayload,
     ) -> Result<DatabaseResponse, DbErr> {
-        let now = Utc::now().naive_utc();
-
         let active_model = entities::items::ActiveModel {
             name: Set(payload.name),
             description: Set(payload.description),
             price: Set(payload.price),
             is_hidden: Set(payload.is_hidden),
-            updated_at: Set(now),
+            updated_at: Set(payload.updated_at),
             ..Default::default()
         };
 

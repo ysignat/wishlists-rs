@@ -4,7 +4,7 @@ use axum::{
     Json,
     Router,
 };
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
 use database::crud::wishlists::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -23,6 +23,7 @@ impl From<HttpCreatePayload> for DatabaseCreatePayload {
             id: Uuid::new_v4(),
             name: val.name,
             user_id: val.user_id,
+            created_at: Utc::now().naive_utc(),
         }
     }
 }
@@ -34,7 +35,10 @@ pub struct HttpUpdatePayload {
 
 impl From<HttpUpdatePayload> for DatabaseUpdatePayload {
     fn from(val: HttpUpdatePayload) -> Self {
-        DatabaseUpdatePayload { name: val.name }
+        DatabaseUpdatePayload {
+            name: val.name,
+            updated_at: Utc::now().naive_utc(),
+        }
     }
 }
 

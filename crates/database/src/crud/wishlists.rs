@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use entities::wishlists::{Entity, Model};
 use sea_orm::{
     ActiveModelTrait,
@@ -21,11 +21,13 @@ pub struct DatabaseCreatePayload {
     pub id: Uuid,
     pub name: String,
     pub user_id: Uuid,
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Deserialize)]
 pub struct DatabaseUpdatePayload {
     pub name: String,
+    pub updated_at: NaiveDateTime,
 }
 
 pub struct DatabaseResponse {
@@ -61,14 +63,12 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
     }
 
     async fn create(&self, payload: DatabaseCreatePayload) -> Result<DatabaseResponse, DbErr> {
-        let now = Utc::now().naive_utc();
-
         entities::wishlists::ActiveModel {
             id: ActiveValue::Set(payload.id),
             user_id: ActiveValue::Set(payload.user_id),
             name: ActiveValue::Set(payload.name),
-            created_at: ActiveValue::Set(now),
-            updated_at: ActiveValue::Set(now),
+            created_at: ActiveValue::Set(payload.created_at),
+            updated_at: ActiveValue::Set(payload.created_at),
         }
         .insert(self.database_connection)
         .await
@@ -80,10 +80,9 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
         id: Uuid,
         payload: DatabaseUpdatePayload,
     ) -> Result<DatabaseResponse, DbErr> {
-        let now = Utc::now().naive_utc();
         let active_model = entities::wishlists::ActiveModel {
             name: Set(payload.name),
-            updated_at: Set(now),
+            updated_at: Set(payload.updated_at),
             ..Default::default()
         };
 

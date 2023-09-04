@@ -33,10 +33,12 @@ RUN \
 ARG JUST_VERSION="1.14.0"
 ARG SEAORM_CLI_VERSION="0.11.3"
 ARG CARGO_INFO_VERSION="0.7.3"
+ARG CARGO_EXPAND_VERSION="1.0.67"
 RUN \
   cargo install cargo-info --version "${CARGO_INFO_VERSION}" \ 
   && cargo install just --version "${JUST_VERSION}" \
   && cargo install sea-orm-cli --version "${SEAORM_CLI_VERSION}" \
+  && cargo install cargo-expand --version "${CARGO_EXPAND_VERSION}" \
   && just --completions bash >> ~/.bash_completions \
   && mkdir -p ~/.vscode-server/extensions \
   && printf '\nalias j=just\n\nif [ -r "${HOME}/.bash_completions" ] ; then\n  . "${HOME}/.bash_completions"\nfi\n' >> ~/.profile \

@@ -1,16 +1,7 @@
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
-use entities::items::{Entity, Model};
-use sea_orm::{
-    ActiveModelTrait,
-    ActiveValue,
-    ColumnTrait,
-    DatabaseConnection,
-    DbErr,
-    EntityTrait,
-    QueryFilter,
-    Set,
-};
+use entities::items::{ActiveModel, Entity, Model};
+use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
 use serde::Deserialize;
 use uuid::Uuid;
 
@@ -25,6 +16,22 @@ pub struct DatabaseCreatePayload {
     pub price: Option<i32>,
     pub is_hidden: bool,
     pub created_at: NaiveDateTime,
+}
+
+impl From<DatabaseCreatePayload> for Model {
+    fn from(value: DatabaseCreatePayload) -> Self {
+        Model {
+            id: value.id,
+            wishlist_id: value.wishlist_id,
+            selected_by_id: None,
+            name: value.name,
+            description: value.description,
+            price: value.price,
+            is_hidden: value.is_hidden,
+            created_at: value.created_at,
+            updated_at: value.created_at,
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -69,35 +76,21 @@ pub struct EntityCrud<'a> {
 }
 
 #[async_trait]
-impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload, DatabaseResponse>
-    for EntityCrud<'_>
-{
+impl EntityCrudTrait<Entity, ActiveModel> for EntityCrud<'_> {
+    type Id = Uuid;
+    type CreatePayload = DatabaseCreatePayload;
+    type UpdatePayload = DatabaseUpdatePayload;
+    type Response = DatabaseResponse;
+
     fn get_database_connection(&self) -> &DatabaseConnection {
         self.database_connection
     }
 
-    async fn create(&self, payload: DatabaseCreatePayload) -> Result<DatabaseResponse, DbErr> {
-        entities::items::ActiveModel {
-            id: ActiveValue::Set(payload.id),
-            wishlist_id: ActiveValue::Set(payload.wishlist_id),
-            selected_by_id: ActiveValue::Set(None),
-            name: ActiveValue::Set(payload.name),
-            description: ActiveValue::Set(payload.description),
-            price: ActiveValue::Set(payload.price),
-            is_hidden: ActiveValue::Set(payload.is_hidden),
-            created_at: ActiveValue::Set(payload.created_at),
-            updated_at: ActiveValue::Set(payload.created_at),
-        }
-        .insert(self.database_connection)
-        .await
-        .map(std::convert::Into::into)
-    }
-
     async fn update(
         &self,
-        id: Uuid,
-        payload: DatabaseUpdatePayload,
-    ) -> Result<DatabaseResponse, DbErr> {
+        id: Self::Id,
+        payload: Self::UpdatePayload,
+    ) -> Result<Self::Response, DbErr> {
         let active_model = entities::items::ActiveModel {
             name: Set(payload.name),
             description: Set(payload.description),
@@ -111,6 +104,6 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
             .filter(entities::items::Column::Id.eq(id))
             .exec(self.database_connection)
             .await
-            .map(std::convert::Into::into)
+            .map(Into::into)
     }
 }

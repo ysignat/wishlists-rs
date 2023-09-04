@@ -1,16 +1,7 @@
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
-use entities::wishlists::{Entity, Model};
-use sea_orm::{
-    ActiveModelTrait,
-    ActiveValue,
-    ColumnTrait,
-    DatabaseConnection,
-    DbErr,
-    EntityTrait,
-    QueryFilter,
-    Set,
-};
+use entities::wishlists::{ActiveModel, Entity, Model};
+use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
 use serde::Deserialize;
 use uuid::Uuid;
 
@@ -22,6 +13,18 @@ pub struct DatabaseCreatePayload {
     pub name: String,
     pub user_id: Uuid,
     pub created_at: NaiveDateTime,
+}
+
+impl From<DatabaseCreatePayload> for Model {
+    fn from(value: DatabaseCreatePayload) -> Self {
+        Model {
+            id: value.id,
+            name: value.name,
+            user_id: value.user_id,
+            created_at: value.created_at,
+            updated_at: value.created_at,
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -55,31 +58,21 @@ pub struct EntityCrud<'a> {
 }
 
 #[async_trait]
-impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload, DatabaseResponse>
-    for EntityCrud<'_>
-{
+impl EntityCrudTrait<Entity, ActiveModel> for EntityCrud<'_> {
+    type Id = Uuid;
+    type CreatePayload = DatabaseCreatePayload;
+    type UpdatePayload = DatabaseUpdatePayload;
+    type Response = DatabaseResponse;
+
     fn get_database_connection(&self) -> &DatabaseConnection {
         self.database_connection
     }
 
-    async fn create(&self, payload: DatabaseCreatePayload) -> Result<DatabaseResponse, DbErr> {
-        entities::wishlists::ActiveModel {
-            id: ActiveValue::Set(payload.id),
-            user_id: ActiveValue::Set(payload.user_id),
-            name: ActiveValue::Set(payload.name),
-            created_at: ActiveValue::Set(payload.created_at),
-            updated_at: ActiveValue::Set(payload.created_at),
-        }
-        .insert(self.database_connection)
-        .await
-        .map(std::convert::Into::into)
-    }
-
     async fn update(
         &self,
-        id: Uuid,
-        payload: DatabaseUpdatePayload,
-    ) -> Result<DatabaseResponse, DbErr> {
+        id: Self::Id,
+        payload: Self::UpdatePayload,
+    ) -> Result<Self::Response, DbErr> {
         let active_model = entities::wishlists::ActiveModel {
             name: Set(payload.name),
             updated_at: Set(payload.updated_at),
@@ -90,6 +83,6 @@ impl EntityCrudTrait<Entity, Uuid, DatabaseCreatePayload, DatabaseUpdatePayload,
             .filter(entities::wishlists::Column::Id.eq(id))
             .exec(self.database_connection)
             .await
-            .map(std::convert::Into::into)
+            .map(Into::into)
     }
 }

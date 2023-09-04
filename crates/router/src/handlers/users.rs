@@ -88,7 +88,7 @@ pub async fn list(
         .list_users()
         .await?
         .into_iter()
-        .map(std::convert::Into::into)
+        .map(Into::into)
         .collect();
 
     Ok((StatusCode::OK, Json(response)))
@@ -98,11 +98,7 @@ pub async fn get(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<Option<HttpResponse>>), AppError> {
-    let response = state
-        .repository
-        .get_user(id)
-        .await?
-        .map(std::convert::Into::into);
+    let response = state.repository.get_user(id).await?.map(Into::into);
 
     Ok((StatusCode::OK, Json(response)))
 }

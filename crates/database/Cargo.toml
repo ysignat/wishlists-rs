@@ -9,7 +9,7 @@ edition = "2021"
 migrations = { path = "../migrations" }
 entities = { path = "../entities" }
 async-trait = "0.1.73"
-chrono = { version = "0.4.28", features = ["serde"] }
+chrono = { version = "0.4.29", features = ["serde"] }
 uuid = { version = "1.4.1", features = ["v4", "serde"] }
 sea-orm = { version = "0.12.2", default-features = false, features = [
   "chrono",
@@ -18,10 +18,10 @@ sea-orm = { version = "0.12.2", default-features = false, features = [
   "debug-print",
   "runtime-tokio",
   "sqlx-postgres",
+  "debug-print",
 ] }
 serde = { version = "1.0.188", features = ["derive"] }
-thiserror = "1.0.47"
-
+thiserror = "1.0.48"
 
 [lib]
 name = "database"

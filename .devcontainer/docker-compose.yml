@@ -10,6 +10,8 @@ services:
       - wishlists-rs-vscode-extensions:/home/vscode/.vscode-server/extensions:rw
     entrypoint: /usr/local/share/docker-init.sh
     command: sleep infinity
+    ports:
+      - 8080:8080/tcp
   postgres:
     image: postgres:15-alpine
     environment:

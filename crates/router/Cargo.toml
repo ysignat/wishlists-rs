@@ -10,8 +10,8 @@ database = { path = "../database" }
 axum = "0.6.20"
 serde = { version = "1.0.188", features = ["derive"] }
 uuid = { version = "1.4.1", features = ["v4", "serde"] }
-anyhow = "1.0.71"
-chrono = { version = "0.4.28", features = ["serde"] }
+anyhow = "1.0.75"
+chrono = { version = "0.4.29", features = ["serde"] }
 
 
 [lib]

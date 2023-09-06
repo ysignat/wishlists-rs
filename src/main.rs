@@ -1,40 +1,40 @@
+#![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
 mod config;
-mod utils;
 
-use axum::Server;
+use axum::{Router as AxumRouter, Server};
 use clap::Parser;
-use config::Config;
-use database::{connection::Connection, migrate};
-use router::Router;
-use utils::{get_bind_address, get_root_path, get_state};
+use config::{Commands, Config};
+use database::{connection::Connection, migrate, repository::Repository};
+use router::{state::State, Router};
 
 #[tokio::main]
 async fn main() {
     let config = Config::parse();
 
     let db_connection = Connection::new(
-        config.postgres_url.clone(),
-        config.postgres_pool_acquire_timeout,
-        config.postgres_pool_size,
+        config.database.url.clone(),
+        config.database.acquire_timeout,
+        config.database.pool_size,
     )
     .connect()
     .await
     .expect("Cannot create connection pool");
 
-    if config.migrate {
-        migrate(&db_connection)
-            .await
-            .expect("Migration not successful");
-    } else {
-        let root_path = get_root_path(&config.app_root_path);
-        let state = get_state(&config).await.unwrap();
-        let bind_address = get_bind_address(&config.app_bind_address);
-        let main_router = Router::new(root_path, state).build();
+    match config.command {
+        Commands::Migrate => {
+            migrate(&db_connection)
+                .await
+                .expect("Migration not successful");
+        }
+        Commands::Run(run_args) => {
+            let state = State::new(Repository::new(db_connection));
+            let router: AxumRouter = Router::new(run_args.root_path.into(), state).into();
 
-        Server::bind(&bind_address)
-            .serve(main_router.into_make_service())
-            .await
-            .expect("Cannot start server");
+            Server::bind(&run_args.bind_address)
+                .serve(router.into_make_service())
+                .await
+                .expect("Cannot start server");
+        }
     }
 }

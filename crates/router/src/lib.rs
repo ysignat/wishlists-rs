@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
 use axum::Router as AxumRouter;
 use handlers::{health, items, users, wishlists};
@@ -17,12 +18,14 @@ impl Router {
     pub fn new(root_path: String, state: State) -> Router {
         Router { root_path, state }
     }
+}
 
-    pub fn build(&self) -> AxumRouter {
+impl From<Router> for AxumRouter {
+    fn from(value: Router) -> Self {
         AxumRouter::new()
-            .merge(users::get_router(&self.root_path, self.state.clone()))
-            .merge(wishlists::get_router(&self.root_path, self.state.clone()))
-            .merge(items::get_router(&self.root_path, self.state.clone()))
-            .merge(health::get_router(&self.root_path, self.state.clone()))
+            .merge(users::get_router(&value.root_path, value.state.clone()))
+            .merge(wishlists::get_router(&value.root_path, value.state.clone()))
+            .merge(items::get_router(&value.root_path, value.state.clone()))
+            .merge(health::get_router(&value.root_path, value.state.clone()))
     }
 }

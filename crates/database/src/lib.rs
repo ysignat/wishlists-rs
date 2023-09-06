@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
 use migrations::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;

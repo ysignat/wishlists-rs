@@ -3,7 +3,7 @@ use std::sync::Arc;
 use database::repository::{Repository, RepositoryTrait};
 
 pub struct State {
-    pub repository: Arc<dyn RepositoryTrait + Send + Sync>,
+    pub(crate) repository: Arc<dyn RepositoryTrait + Send + Sync>,
 }
 
 impl Clone for State {

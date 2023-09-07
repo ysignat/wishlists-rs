@@ -12,7 +12,7 @@ use uuid::Uuid;
 use crate::{errors::AppError, state::State};
 
 #[derive(Deserialize)]
-pub struct HttpCreatePayload {
+struct HttpCreatePayload {
     first_name: Option<String>,
     second_name: Option<String>,
     nick_name: String,
@@ -31,7 +31,7 @@ impl From<HttpCreatePayload> for DatabaseCreatePayload {
 }
 
 #[derive(Deserialize)]
-pub struct HttpUpdatePayload {
+struct HttpUpdatePayload {
     first_name: Option<String>,
     second_name: Option<String>,
     nick_name: String,
@@ -49,7 +49,7 @@ impl From<HttpUpdatePayload> for DatabaseUpdatePayload {
 }
 
 #[derive(Serialize)]
-pub struct HttpResponse {
+struct HttpResponse {
     id: Uuid,
     first_name: Option<String>,
     second_name: Option<String>,
@@ -71,7 +71,7 @@ impl From<DatabaseResponse> for HttpResponse {
     }
 }
 
-pub async fn create(
+async fn create(
     AxumState(state): AxumState<State>,
     Json(payload): Json<HttpCreatePayload>,
 ) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
@@ -80,7 +80,7 @@ pub async fn create(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-pub async fn list(
+async fn list(
     AxumState(state): AxumState<State>,
 ) -> Result<(StatusCode, Json<Vec<HttpResponse>>), AppError> {
     let response = state
@@ -94,7 +94,7 @@ pub async fn list(
     Ok((StatusCode::OK, Json(response)))
 }
 
-pub async fn get(
+async fn get(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<Option<HttpResponse>>), AppError> {
@@ -103,7 +103,7 @@ pub async fn get(
     Ok((StatusCode::OK, Json(response)))
 }
 
-pub async fn update(
+async fn update(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
     Json(payload): Json<HttpUpdatePayload>,
@@ -117,7 +117,7 @@ pub async fn update(
     Ok((StatusCode::OK, Json(response)))
 }
 
-pub async fn delete(
+async fn delete(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
 ) -> Result<(StatusCode, String), AppError> {
@@ -128,7 +128,7 @@ pub async fn delete(
 
 static SUBPATH: &str = "/users";
 
-pub fn get_router(root_path: &str, state: State) -> Router {
+pub(crate) fn get_router(root_path: &str, state: State) -> Router {
     Router::new()
         .route(
             &format!("{root_path}{SUBPATH}"),

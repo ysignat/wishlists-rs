@@ -12,14 +12,9 @@ use router::{state::State, Router};
 async fn main() {
     let config = Config::parse();
 
-    let db_connection = Connection::new(
-        config.database.url.clone(),
-        config.database.acquire_timeout,
-        config.database.pool_size,
-    )
-    .connect()
-    .await
-    .expect("Cannot create connection pool");
+    let db_connection = Connection::connect(config.database.into())
+        .await
+        .expect("Cannot create connection pool");
 
     match config.command {
         Commands::Migrate => {

@@ -4,7 +4,7 @@ use crate::state::State;
 
 static SUBPATH: &str = "/health";
 
-pub fn get_router(root_path: &str, state: State) -> Router {
+pub(crate) fn get_router(root_path: &str, state: State) -> Router {
     Router::new().route(
         &format!("{root_path}{SUBPATH}"),
         axum::routing::get(healthcheck).with_state(state),

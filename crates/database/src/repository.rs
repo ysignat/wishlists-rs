@@ -63,7 +63,7 @@ pub trait RepositoryTrait {
 }
 
 pub struct Repository {
-    pub database_connection: DatabaseConnection,
+    database_connection: DatabaseConnection,
 }
 
 #[async_trait]

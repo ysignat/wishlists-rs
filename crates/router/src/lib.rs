@@ -4,7 +4,7 @@ use axum::Router as AxumRouter;
 use handlers::{health, items, users, wishlists};
 use state::State;
 
-pub mod errors;
+mod errors;
 mod handlers;
 pub mod state;
 

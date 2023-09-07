@@ -53,8 +53,8 @@ impl From<Model> for DatabaseResponse {
     }
 }
 
-pub struct Crud<'a> {
-    pub database_connection: &'a DatabaseConnection,
+pub(crate) struct Crud<'a> {
+    pub(crate) database_connection: &'a DatabaseConnection,
 }
 
 #[async_trait]

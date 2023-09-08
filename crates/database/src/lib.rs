@@ -11,14 +11,14 @@ pub mod repository;
 /// # Errors
 ///
 /// Will return `DataError` if migration attempt is unsuccessful
-pub async fn migrate(connection: &DatabaseConnection) -> Result<(), DataError> {
+pub async fn migrate(connection: &DatabaseConnection) -> Result<(), DatabaseError> {
     Migrator::up(connection, None)
         .await
-        .or(Err(DataError::Unknown))
+        .or(Err(DatabaseError::Unknown))
 }
 
 #[derive(Debug, Error)]
-pub enum DataError {
+pub enum DatabaseError {
     #[error("Unknown database error")]
     Unknown,
 }

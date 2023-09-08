@@ -5,7 +5,7 @@ use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, 
 use serde::Deserialize;
 use uuid::Uuid;
 
-use super::CrudTrait;
+use super::EntityCrudTrait;
 
 #[derive(Deserialize)]
 pub struct DatabaseCreatePayload {
@@ -59,10 +59,10 @@ impl From<Model> for DatabaseResponse {
     }
 }
 
-pub(crate) struct Crud;
+pub(crate) struct EntityCrud;
 
 #[async_trait]
-impl CrudTrait<Entity, ActiveModel> for Crud {
+impl EntityCrudTrait<Entity, ActiveModel> for EntityCrud {
     type Id = Uuid;
     type CreatePayload = DatabaseCreatePayload;
     type UpdatePayload = DatabaseUpdatePayload;

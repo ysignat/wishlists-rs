@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 
-use crate::DataError;
+use crate::DatabaseError;
 
 pub struct DatabaseConnectOptions {
     pub url: String,
@@ -54,10 +54,10 @@ impl Connection {
     /// Will return `DataError` if cannot create connection pool
     pub async fn connect(
         database_connect_options: DatabaseConnectOptions,
-    ) -> Result<DatabaseConnection, DataError> {
+    ) -> Result<DatabaseConnection, DatabaseError> {
         let connect_options: ConnectOptions = database_connect_options.into();
         Database::connect(connect_options)
             .await
-            .or(Err(DataError::Unknown))
+            .or(Err(DatabaseError::Unknown))
     }
 }

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use database::repository::{Repository, RepositoryTrait};
+use database::{Repository, RepositoryTrait};
 
 pub struct State {
     pub(crate) repository: Arc<dyn RepositoryTrait + Send + Sync>,

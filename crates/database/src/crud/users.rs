@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
+pub use entities::users::Model as DatabaseResponse;
 use entities::users::{ActiveModel, Entity, Model};
 use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
 use serde::Deserialize;
@@ -37,29 +38,7 @@ pub struct DatabaseUpdatePayload {
     pub updated_at: NaiveDateTime,
 }
 
-pub struct DatabaseResponse {
-    pub id: Uuid,
-    pub first_name: Option<String>,
-    pub second_name: Option<String>,
-    pub nick_name: String,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-}
-
-impl From<Model> for DatabaseResponse {
-    fn from(value: Model) -> Self {
-        DatabaseResponse {
-            id: value.id,
-            first_name: value.first_name,
-            second_name: value.second_name,
-            nick_name: value.nick_name,
-            created_at: value.created_at,
-            updated_at: value.updated_at,
-        }
-    }
-}
-
-pub(crate) struct Crud;
+pub struct Crud;
 
 #[async_trait]
 impl CrudTrait<Entity, ActiveModel> for Crud {

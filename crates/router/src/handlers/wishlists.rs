@@ -5,7 +5,7 @@ use axum::{
     Router,
 };
 use chrono::{NaiveDateTime, Utc};
-use database::crud::wishlists::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
+use database::wishlists::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

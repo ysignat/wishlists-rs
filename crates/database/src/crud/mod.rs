@@ -15,7 +15,7 @@ pub mod wishlists;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub(crate) trait CrudTrait<T, Y>
+pub(crate) trait EntityCrudTrait<T, Y>
 where
     T: EntityTrait,
     Y: ActiveModelBehavior + Send + From<T::Model>,

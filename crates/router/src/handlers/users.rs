@@ -5,7 +5,7 @@ use axum::{
     Router,
 };
 use chrono::{NaiveDateTime, Utc};
-use database::users::{DatabaseCreatePayload, DatabaseResponse, DatabaseUpdatePayload};
+use database::{UsersDatabaseCreatePayload, UsersDatabaseResponse, UsersDatabaseUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -18,9 +18,9 @@ struct HttpCreatePayload {
     nick_name: String,
 }
 
-impl From<HttpCreatePayload> for DatabaseCreatePayload {
+impl From<HttpCreatePayload> for UsersDatabaseCreatePayload {
     fn from(val: HttpCreatePayload) -> Self {
-        DatabaseCreatePayload {
+        UsersDatabaseCreatePayload {
             id: Uuid::new_v4(),
             first_name: val.first_name,
             second_name: val.second_name,
@@ -37,9 +37,9 @@ struct HttpUpdatePayload {
     nick_name: String,
 }
 
-impl From<HttpUpdatePayload> for DatabaseUpdatePayload {
+impl From<HttpUpdatePayload> for UsersDatabaseUpdatePayload {
     fn from(val: HttpUpdatePayload) -> Self {
-        DatabaseUpdatePayload {
+        UsersDatabaseUpdatePayload {
             first_name: val.first_name,
             second_name: val.second_name,
             nick_name: val.nick_name,
@@ -58,8 +58,8 @@ struct HttpResponse {
     updated_at: NaiveDateTime,
 }
 
-impl From<DatabaseResponse> for HttpResponse {
-    fn from(value: DatabaseResponse) -> Self {
+impl From<UsersDatabaseResponse> for HttpResponse {
+    fn from(value: UsersDatabaseResponse) -> Self {
         HttpResponse {
             id: value.id,
             first_name: value.first_name,

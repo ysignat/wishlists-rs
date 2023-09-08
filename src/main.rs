@@ -4,7 +4,7 @@ mod config;
 
 use axum::{Router as AxumRouter, Server};
 use clap::Parser;
-use config::{Commands, Config};
+use config::{Commands, Config, LogFormat};
 use database::{ConnectOptions, Database, Migrator, MigratorTrait, Repository};
 use router::{state::State, Router};
 

@@ -1,9 +1,10 @@
 use async_trait::async_trait;
+#[allow(clippy::module_name_repetitions)]
 pub use items::{
+    CreatePayload as ItemsCreatePayload,
     Crud as ItemsCrud,
-    DatabaseCreatePayload as ItemsDatabaseCreatePayload,
-    DatabaseResponse as ItemsDatabaseResponse,
-    DatabaseUpdatePayload as ItemsDatabaseUpdatePayload,
+    Response as ItemsResponse,
+    UpdatePayload as ItemsUpdatePayload,
 };
 use sea_orm::{
     ActiveModelBehavior,
@@ -14,17 +15,19 @@ use sea_orm::{
     IntoActiveModel,
     PrimaryKeyTrait,
 };
+#[allow(clippy::module_name_repetitions)]
 pub use users::{
+    CreatePayload as UsersCreatePayload,
     Crud as UsersCrud,
-    DatabaseCreatePayload as UsersDatabaseCreatePayload,
-    DatabaseResponse as UsersDatabaseResponse,
-    DatabaseUpdatePayload as UsersDatabaseUpdatePayload,
+    Response as UsersResponse,
+    UpdatePayload as UsersUpdatePayload,
 };
+#[allow(clippy::module_name_repetitions)]
 pub use wishlists::{
+    CreatePayload as WishlistsCreatePayload,
     Crud as WishlistsCrud,
-    DatabaseCreatePayload as WishlistsDatabaseCreatePayload,
-    DatabaseResponse as WishlistsDatabaseResponse,
-    DatabaseUpdatePayload as WishlistsDatabaseUpdatePayload,
+    Response as WishlistsResponse,
+    UpdatePayload as WishlistsUpdatePayload,
 };
 
 mod items;

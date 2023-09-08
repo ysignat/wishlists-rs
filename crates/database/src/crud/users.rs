@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
-pub use entities::users::Model as DatabaseResponse;
+pub use entities::users::Model as Response;
 use entities::users::{ActiveModel, Entity, Model};
 use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
 use serde::Deserialize;
@@ -9,7 +9,7 @@ use uuid::Uuid;
 use super::CrudTrait;
 
 #[derive(Deserialize)]
-pub struct DatabaseCreatePayload {
+pub struct CreatePayload {
     pub id: Uuid,
     pub first_name: Option<String>,
     pub second_name: Option<String>,
@@ -17,8 +17,8 @@ pub struct DatabaseCreatePayload {
     pub created_at: NaiveDateTime,
 }
 
-impl From<DatabaseCreatePayload> for Model {
-    fn from(value: DatabaseCreatePayload) -> Self {
+impl From<CreatePayload> for Model {
+    fn from(value: CreatePayload) -> Self {
         Model {
             id: value.id,
             first_name: value.first_name,
@@ -31,7 +31,7 @@ impl From<DatabaseCreatePayload> for Model {
 }
 
 #[derive(Deserialize)]
-pub struct DatabaseUpdatePayload {
+pub struct UpdatePayload {
     pub first_name: Option<String>,
     pub second_name: Option<String>,
     pub nick_name: String,
@@ -43,9 +43,9 @@ pub struct Crud;
 #[async_trait]
 impl CrudTrait<Entity, ActiveModel> for Crud {
     type Id = Uuid;
-    type CreatePayload = DatabaseCreatePayload;
-    type UpdatePayload = DatabaseUpdatePayload;
-    type Response = DatabaseResponse;
+    type CreatePayload = CreatePayload;
+    type UpdatePayload = UpdatePayload;
+    type Response = Response;
 
     async fn update(
         database_connection: &DatabaseConnection,

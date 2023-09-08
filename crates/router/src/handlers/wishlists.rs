@@ -5,11 +5,7 @@ use axum::{
     Router,
 };
 use chrono::{NaiveDateTime, Utc};
-use database::{
-    WishlistsDatabaseCreatePayload,
-    WishlistsDatabaseResponse,
-    WishlistsDatabaseUpdatePayload,
-};
+use database::{WishlistsCreatePayload, WishlistsResponse, WishlistsUpdatePayload};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -21,9 +17,9 @@ struct HttpCreatePayload {
     user_id: Uuid,
 }
 
-impl From<HttpCreatePayload> for WishlistsDatabaseCreatePayload {
+impl From<HttpCreatePayload> for WishlistsCreatePayload {
     fn from(val: HttpCreatePayload) -> Self {
-        WishlistsDatabaseCreatePayload {
+        WishlistsCreatePayload {
             id: Uuid::new_v4(),
             name: val.name,
             user_id: val.user_id,
@@ -37,9 +33,9 @@ struct HttpUpdatePayload {
     name: String,
 }
 
-impl From<HttpUpdatePayload> for WishlistsDatabaseUpdatePayload {
+impl From<HttpUpdatePayload> for WishlistsUpdatePayload {
     fn from(val: HttpUpdatePayload) -> Self {
-        WishlistsDatabaseUpdatePayload {
+        WishlistsUpdatePayload {
             name: val.name,
             updated_at: Utc::now().naive_utc(),
         }
@@ -55,8 +51,8 @@ struct HttpResponse {
     updated_at: NaiveDateTime,
 }
 
-impl From<WishlistsDatabaseResponse> for HttpResponse {
-    fn from(value: WishlistsDatabaseResponse) -> Self {
+impl From<WishlistsResponse> for HttpResponse {
+    fn from(value: WishlistsResponse) -> Self {
         HttpResponse {
             id: value.id,
             name: value.name,

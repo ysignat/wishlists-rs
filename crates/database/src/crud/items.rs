@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
-pub use entities::items::Model as DatabaseResponse;
+pub use entities::items::Model as Response;
 use entities::items::{ActiveModel, Entity, Model};
 use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
 use serde::Deserialize;
@@ -9,7 +9,7 @@ use uuid::Uuid;
 use super::CrudTrait;
 
 #[derive(Deserialize)]
-pub struct DatabaseCreatePayload {
+pub struct CreatePayload {
     pub id: Uuid,
     pub wishlist_id: Uuid,
     pub name: String,
@@ -19,8 +19,8 @@ pub struct DatabaseCreatePayload {
     pub created_at: NaiveDateTime,
 }
 
-impl From<DatabaseCreatePayload> for Model {
-    fn from(value: DatabaseCreatePayload) -> Self {
+impl From<CreatePayload> for Model {
+    fn from(value: CreatePayload) -> Self {
         Model {
             id: value.id,
             wishlist_id: value.wishlist_id,
@@ -36,7 +36,7 @@ impl From<DatabaseCreatePayload> for Model {
 }
 
 #[derive(Deserialize)]
-pub struct DatabaseUpdatePayload {
+pub struct UpdatePayload {
     pub name: String,
     pub description: Option<String>,
     pub price: Option<i32>,
@@ -49,9 +49,9 @@ pub struct Crud;
 #[async_trait]
 impl CrudTrait<Entity, ActiveModel> for Crud {
     type Id = Uuid;
-    type CreatePayload = DatabaseCreatePayload;
-    type UpdatePayload = DatabaseUpdatePayload;
-    type Response = DatabaseResponse;
+    type CreatePayload = CreatePayload;
+    type UpdatePayload = UpdatePayload;
+    type Response = Response;
 
     async fn update(
         database_connection: &DatabaseConnection,
@@ -71,6 +71,5 @@ impl CrudTrait<Entity, ActiveModel> for Crud {
             .filter(entities::items::Column::Id.eq(id))
             .exec(database_connection)
             .await
-            .map(Into::into)
     }
 }

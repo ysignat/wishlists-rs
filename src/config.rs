@@ -1,20 +1,20 @@
 use std::{net::SocketAddr, time::Duration};
 
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 use database::connection::DatabaseConnectOptions;
-// use tracing_subscriber::filter::LevelFilter; // TODO: Preparation for logging
+use tracing_subscriber::filter::LevelFilter;
 
 const ENV_PREFIX: &str = "WISHLISTS";
 const ENV_SEPARATOR: &str = "__";
 
 const DATABASE_ENV_PREFIX: &str = "DATABASE";
 const RUN_ENV_PREFIX: &str = "RUN";
-// const LOG_ENV_PREFIX: &str = "LOG"; // TODO: Preparation for logging
+const LOG_ENV_PREFIX: &str = "LOG";
 
 const LONG_SEPARATOR: &str = "-";
 const DATABASE_LONG_PREFIX: &str = "database";
 const RUN_LONG_PREFIX: &str = "run";
-// const LOG_LONG_PREFIX: &str = "log"; // TODO: Preparation for logging
+const LOG_LONG_PREFIX: &str = "log";
 
 struct ArgMetadata {
     prefix: Option<String>,
@@ -72,8 +72,8 @@ pub struct Config {
     pub command: Commands,
     #[command(flatten)]
     pub database: DatabaseArgs,
-    // #[command(flatten)] // TODO: Preparation for logging
-    // logging: LoggingArgs,
+    #[command(flatten)]
+    pub log: LogArgs,
 }
 
 #[derive(Subcommand, PartialEq, Eq)]
@@ -152,19 +152,29 @@ impl From<DatabaseArgs> for DatabaseConnectOptions {
     }
 }
 
-// #[derive(Args)] // TODO: Preparation for logging
-// struct LoggingArgs {
-// #[command(long, default_value = "INFO", env = add_prefix(&[LOG_ENV_PREFIX,"LEVEL"]), global = true)]
-// log_level: LevelFilter,
-// #[clap(long, env = add_prefix(&[LOG_ENV_PREFIX,"FORMAT"]), global = true)]
-// log_format: LogFormat,
-// }
+#[derive(Args)]
+pub struct LogArgs {
+    #[arg(
+        long = LongArg::construct(&[LOG_LONG_PREFIX,"level"]), 
+        default_value = "INFO", 
+        env = EnvArg::construct(&[LOG_ENV_PREFIX,"LEVEL"]), 
+        global = true
+    )]
+    pub level: LevelFilter,
+    #[arg(
+        long = LongArg::construct(&[LOG_LONG_PREFIX,"format"]), 
+        default_value = "raw",
+        env = EnvArg::construct(&[LOG_ENV_PREFIX,"FORMAT"]), 
+        global = true
+    )]
+    pub format: LogFormat,
+}
 
-// #[derive(Clone, ValueEnum)]  // TODO: Preparation for logging
-// enum LogFormat {
-//     Raw,
-//     Json,
-// }
+#[derive(Clone, ValueEnum, PartialEq, Eq)]
+pub enum LogFormat {
+    Raw,
+    Json,
+}
 
 #[derive(Args, PartialEq, Eq)]
 pub struct RunArgs {

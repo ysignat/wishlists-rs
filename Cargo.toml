@@ -24,3 +24,4 @@ axum = "0.6.20"
 tokio = { version = "1.32.0", features = ["macros", "rt-multi-thread"] }
 clap = { version = "4.4.2", features = ["derive", "env", "string"] }
 log = { version = "0.4.20", features = ["std"] }
+tracing-subscriber = { version = "0.3.17", features = ["json"] }

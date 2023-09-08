@@ -72,27 +72,15 @@ impl RepositoryTrait for Repository {
         &self,
         payload: items::DatabaseCreatePayload,
     ) -> Result<items::DatabaseResponse, DbErr> {
-        items::Crud {
-            database_connection: &self.database_connection,
-        }
-        .create(payload)
-        .await
+        items::Crud::create(&self.database_connection, payload).await
     }
 
     async fn get_item(&self, id: Uuid) -> Result<Option<items::DatabaseResponse>, DbErr> {
-        items::Crud {
-            database_connection: &self.database_connection,
-        }
-        .get(id)
-        .await
+        items::Crud::get(&self.database_connection, id).await
     }
 
     async fn list_items(&self) -> Result<Vec<items::DatabaseResponse>, DbErr> {
-        items::Crud {
-            database_connection: &self.database_connection,
-        }
-        .list()
-        .await
+        items::Crud::list(&self.database_connection).await
     }
 
     async fn update_item(
@@ -100,46 +88,26 @@ impl RepositoryTrait for Repository {
         id: Uuid,
         payload: items::DatabaseUpdatePayload,
     ) -> Result<items::DatabaseResponse, DbErr> {
-        items::Crud {
-            database_connection: &self.database_connection,
-        }
-        .update(id, payload)
-        .await
+        items::Crud::update(&self.database_connection, id, payload).await
     }
 
     async fn delete_item(&self, id: Uuid) -> Result<(), DbErr> {
-        items::Crud {
-            database_connection: &self.database_connection,
-        }
-        .delete(id)
-        .await
+        items::Crud::delete(&self.database_connection, id).await
     }
 
     async fn create_user(
         &self,
         payload: users::DatabaseCreatePayload,
     ) -> Result<users::DatabaseResponse, DbErr> {
-        users::Crud {
-            database_connection: &self.database_connection,
-        }
-        .create(payload)
-        .await
+        users::Crud::create(&self.database_connection, payload).await
     }
 
     async fn get_user(&self, id: Uuid) -> Result<Option<users::DatabaseResponse>, DbErr> {
-        users::Crud {
-            database_connection: &self.database_connection,
-        }
-        .get(id)
-        .await
+        users::Crud::get(&self.database_connection, id).await
     }
 
     async fn list_users(&self) -> Result<Vec<users::DatabaseResponse>, DbErr> {
-        users::Crud {
-            database_connection: &self.database_connection,
-        }
-        .list()
-        .await
+        users::Crud::list(&self.database_connection).await
     }
 
     async fn update_user(
@@ -147,46 +115,26 @@ impl RepositoryTrait for Repository {
         id: Uuid,
         payload: users::DatabaseUpdatePayload,
     ) -> Result<users::DatabaseResponse, DbErr> {
-        users::Crud {
-            database_connection: &self.database_connection,
-        }
-        .update(id, payload)
-        .await
+        users::Crud::update(&self.database_connection, id, payload).await
     }
 
     async fn delete_user(&self, id: Uuid) -> Result<(), DbErr> {
-        users::Crud {
-            database_connection: &self.database_connection,
-        }
-        .delete(id)
-        .await
+        users::Crud::delete(&self.database_connection, id).await
     }
 
     async fn create_wishlist(
         &self,
         payload: wishlists::DatabaseCreatePayload,
     ) -> Result<wishlists::DatabaseResponse, DbErr> {
-        wishlists::Crud {
-            database_connection: &self.database_connection,
-        }
-        .create(payload)
-        .await
+        wishlists::Crud::create(&self.database_connection, payload).await
     }
 
     async fn get_wishlist(&self, id: Uuid) -> Result<Option<wishlists::DatabaseResponse>, DbErr> {
-        wishlists::Crud {
-            database_connection: &self.database_connection,
-        }
-        .get(id)
-        .await
+        wishlists::Crud::get(&self.database_connection, id).await
     }
 
     async fn list_wishlists(&self) -> Result<Vec<wishlists::DatabaseResponse>, DbErr> {
-        wishlists::Crud {
-            database_connection: &self.database_connection,
-        }
-        .list()
-        .await
+        wishlists::Crud::list(&self.database_connection).await
     }
 
     async fn update_wishlist(
@@ -194,19 +142,11 @@ impl RepositoryTrait for Repository {
         id: Uuid,
         payload: wishlists::DatabaseUpdatePayload,
     ) -> Result<wishlists::DatabaseResponse, DbErr> {
-        wishlists::Crud {
-            database_connection: &self.database_connection,
-        }
-        .update(id, payload)
-        .await
+        wishlists::Crud::update(&self.database_connection, id, payload).await
     }
 
     async fn delete_wishlist(&self, id: Uuid) -> Result<(), DbErr> {
-        wishlists::Crud {
-            database_connection: &self.database_connection,
-        }
-        .delete(id)
-        .await
+        wishlists::Crud::delete(&self.database_connection, id).await
     }
 
     async fn healthcheck(&self) -> Result<(), DbErr> {

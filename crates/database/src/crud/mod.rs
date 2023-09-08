@@ -26,10 +26,10 @@ where
     type UpdatePayload;
     type Response: From<T::Model> + From<<<Y as ActiveModelTrait>::Entity as EntityTrait>::Model>;
 
-    fn get_database_connection(&self) -> &DatabaseConnection;
-
-    async fn create(&self, payload: Self::CreatePayload) -> Result<Self::Response, DbErr> {
-        let database_connection = self.get_database_connection();
+    async fn create(
+        database_connection: &DatabaseConnection,
+        payload: Self::CreatePayload,
+    ) -> Result<Self::Response, DbErr> {
         let model: T::Model = payload.into();
         let active_model: Y = model.into();
         active_model
@@ -38,16 +38,17 @@ where
             .map(Into::into)
     }
 
-    async fn get(&self, id: Self::Id) -> Result<Option<Self::Response>, DbErr> {
-        let database_connection = self.get_database_connection();
+    async fn get(
+        database_connection: &DatabaseConnection,
+        id: Self::Id,
+    ) -> Result<Option<Self::Response>, DbErr> {
         T::find_by_id(id)
             .one(database_connection)
             .await
             .map(|x| x.map(Into::into))
     }
 
-    async fn list(&self) -> Result<Vec<Self::Response>, DbErr> {
-        let database_connection = self.get_database_connection();
+    async fn list(database_connection: &DatabaseConnection) -> Result<Vec<Self::Response>, DbErr> {
         T::find()
             .all(database_connection)
             .await
@@ -55,13 +56,12 @@ where
     }
 
     async fn update(
-        &self,
+        database_connection: &DatabaseConnection,
         id: Self::Id,
         payload: Self::UpdatePayload,
     ) -> Result<Self::Response, DbErr>;
 
-    async fn delete(&self, id: Self::Id) -> Result<(), DbErr> {
-        let database_connection = self.get_database_connection();
+    async fn delete(database_connection: &DatabaseConnection, id: Self::Id) -> Result<(), DbErr> {
         T::delete_by_id(id)
             .exec(database_connection)
             .await

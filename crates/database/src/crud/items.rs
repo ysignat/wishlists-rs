@@ -71,23 +71,17 @@ impl From<Model> for DatabaseResponse {
     }
 }
 
-pub(crate) struct Crud<'a> {
-    pub(crate) database_connection: &'a DatabaseConnection,
-}
+pub(crate) struct Crud;
 
 #[async_trait]
-impl CrudTrait<Entity, ActiveModel> for Crud<'_> {
+impl CrudTrait<Entity, ActiveModel> for Crud {
     type Id = Uuid;
     type CreatePayload = DatabaseCreatePayload;
     type UpdatePayload = DatabaseUpdatePayload;
     type Response = DatabaseResponse;
 
-    fn get_database_connection(&self) -> &DatabaseConnection {
-        self.database_connection
-    }
-
     async fn update(
-        &self,
+        database_connection: &DatabaseConnection,
         id: Self::Id,
         payload: Self::UpdatePayload,
     ) -> Result<Self::Response, DbErr> {
@@ -102,7 +96,7 @@ impl CrudTrait<Entity, ActiveModel> for Crud<'_> {
 
         entities::items::Entity::update(active_model)
             .filter(entities::items::Column::Id.eq(id))
-            .exec(self.database_connection)
+            .exec(database_connection)
             .await
             .map(Into::into)
     }

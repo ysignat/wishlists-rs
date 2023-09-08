@@ -51,7 +51,7 @@ pub struct Connection;
 impl Connection {
     /// # Errors
     ///
-    /// Will return `DataError` if database, specified in URL, is unreachable
+    /// Will return `DataError` if cannot create connection pool
     pub async fn connect(
         database_connect_options: DatabaseConnectOptions,
     ) -> Result<DatabaseConnection, DataError> {

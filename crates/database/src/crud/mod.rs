@@ -1,4 +1,11 @@
 use async_trait::async_trait;
+#[allow(clippy::module_name_repetitions)]
+pub use items::{
+    CreatePayload as ItemsCreatePayload,
+    Crud as ItemsCrud,
+    Response as ItemsResponse,
+    UpdatePayload as ItemsUpdatePayload,
+};
 use sea_orm::{
     ActiveModelBehavior,
     ActiveModelTrait,
@@ -8,14 +15,28 @@ use sea_orm::{
     IntoActiveModel,
     PrimaryKeyTrait,
 };
+#[allow(clippy::module_name_repetitions)]
+pub use users::{
+    CreatePayload as UsersCreatePayload,
+    Crud as UsersCrud,
+    Response as UsersResponse,
+    UpdatePayload as UsersUpdatePayload,
+};
+#[allow(clippy::module_name_repetitions)]
+pub use wishlists::{
+    CreatePayload as WishlistsCreatePayload,
+    Crud as WishlistsCrud,
+    Response as WishlistsResponse,
+    UpdatePayload as WishlistsUpdatePayload,
+};
 
-pub mod items;
-pub mod users;
-pub mod wishlists;
+mod items;
+mod users;
+mod wishlists;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub(crate) trait EntityCrudTrait<T, Y>
+pub(super) trait CrudTrait<T, Y>
 where
     T: EntityTrait,
     Y: ActiveModelBehavior + Send + From<T::Model>,

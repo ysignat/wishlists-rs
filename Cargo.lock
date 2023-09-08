@@ -925,7 +925,6 @@ dependencies = [
  "migrations",
  "sea-orm",
  "serde",
- "thiserror",
  "uuid",
 ]
 

@@ -1,22 +1,23 @@
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
+pub use entities::wishlists::Model as Response;
 use entities::wishlists::{ActiveModel, Entity, Model};
 use sea_orm::{ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
 use serde::Deserialize;
 use uuid::Uuid;
 
-use super::EntityCrudTrait;
+use super::CrudTrait;
 
 #[derive(Deserialize)]
-pub struct DatabaseCreatePayload {
+pub struct CreatePayload {
     pub id: Uuid,
     pub name: String,
     pub user_id: Uuid,
     pub created_at: NaiveDateTime,
 }
 
-impl From<DatabaseCreatePayload> for Model {
-    fn from(value: DatabaseCreatePayload) -> Self {
+impl From<CreatePayload> for Model {
+    fn from(value: CreatePayload) -> Self {
         Model {
             id: value.id,
             name: value.name,
@@ -28,39 +29,19 @@ impl From<DatabaseCreatePayload> for Model {
 }
 
 #[derive(Deserialize)]
-pub struct DatabaseUpdatePayload {
+pub struct UpdatePayload {
     pub name: String,
     pub updated_at: NaiveDateTime,
 }
 
-pub struct DatabaseResponse {
-    pub id: Uuid,
-    pub name: String,
-    pub user_id: Uuid,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-}
-
-impl From<Model> for DatabaseResponse {
-    fn from(value: Model) -> Self {
-        DatabaseResponse {
-            id: value.id,
-            name: value.name,
-            user_id: value.user_id,
-            created_at: value.created_at,
-            updated_at: value.updated_at,
-        }
-    }
-}
-
-pub(crate) struct EntityCrud;
+pub struct Crud;
 
 #[async_trait]
-impl EntityCrudTrait<Entity, ActiveModel> for EntityCrud {
+impl CrudTrait<Entity, ActiveModel> for Crud {
     type Id = Uuid;
-    type CreatePayload = DatabaseCreatePayload;
-    type UpdatePayload = DatabaseUpdatePayload;
-    type Response = DatabaseResponse;
+    type CreatePayload = CreatePayload;
+    type UpdatePayload = UpdatePayload;
+    type Response = Response;
 
     async fn update(
         database_connection: &DatabaseConnection,

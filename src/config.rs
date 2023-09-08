@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, time::Duration};
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use database::connection::DatabaseConnectOptions;
+use database::ConnectOptions;
 use tracing_subscriber::filter::LevelFilter;
 
 const ENV_PREFIX: &str = "WISHLISTS";
@@ -138,17 +138,35 @@ pub struct DatabaseArgs {
     max_lifetime: Option<u64>,
 }
 
-impl From<DatabaseArgs> for DatabaseConnectOptions {
+impl From<DatabaseArgs> for ConnectOptions {
     fn from(value: DatabaseArgs) -> Self {
-        DatabaseConnectOptions {
-            url: value.url,
-            max_connections: value.max_connections,
-            min_connections: value.min_connections,
-            connect_timeout: value.connect_timeout.map(Duration::from_secs),
-            idle_timeout: value.idle_timeout.map(Duration::from_secs),
-            acquire_timeout: value.acquire_timeout.map(Duration::from_secs),
-            max_lifetime: value.max_lifetime.map(Duration::from_secs),
+        let mut database_connection = ConnectOptions::new(value.url);
+
+        if let Some(max_connections) = value.max_connections {
+            database_connection.max_connections(max_connections);
         }
+
+        if let Some(min_connections) = value.min_connections {
+            database_connection.min_connections(min_connections);
+        }
+
+        if let Some(connect_timeout) = value.connect_timeout {
+            database_connection.connect_timeout(Duration::from_secs(connect_timeout));
+        }
+
+        if let Some(idle_timeout) = value.idle_timeout {
+            database_connection.idle_timeout(Duration::from_secs(idle_timeout));
+        }
+
+        if let Some(acquire_timeout) = value.acquire_timeout {
+            database_connection.acquire_timeout(Duration::from_secs(acquire_timeout));
+        }
+
+        if let Some(max_lifetime) = value.max_lifetime {
+            database_connection.max_lifetime(Duration::from_secs(max_lifetime));
+        }
+
+        database_connection
     }
 }
 

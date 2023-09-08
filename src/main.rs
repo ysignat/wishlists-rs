@@ -5,7 +5,7 @@ mod config;
 use axum::{Router as AxumRouter, Server};
 use clap::Parser;
 use config::{Commands, Config, LogFormat};
-use database::{connection::Connection, migrate, repository::Repository};
+use database::{ConnectOptions, Database, Migrator, MigratorTrait, Repository};
 use router::{state::State, Router};
 
 #[tokio::main]
@@ -20,13 +20,14 @@ async fn main() {
         subscriber_builder.init();
     }
 
-    let db_connection = Connection::connect(config.database.into())
+    let db_connect_options: ConnectOptions = config.database.into();
+    let db_connection = Database::connect(db_connect_options)
         .await
         .expect("Cannot create connection pool");
 
     match config.command {
         Commands::Migrate => {
-            migrate(&db_connection)
+            Migrator::up(&db_connection, None)
                 .await
                 .expect("Migration not successful");
         }

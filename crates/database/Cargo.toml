@@ -21,7 +21,6 @@ sea-orm = { version = "0.12.2", default-features = false, features = [
   "debug-print",
 ] }
 serde = { version = "1.0.188", features = ["derive"] }
-thiserror = "1.0.48"
 
 [lib]
 name = "database"

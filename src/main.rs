@@ -7,6 +7,7 @@ use clap::Parser;
 use config::{Commands, Config, LogFormat};
 use database::{ConnectOptions, Database, Migrator, MigratorTrait, Repository};
 use router::{state::State, Router};
+use tracing::error;
 
 #[tokio::main]
 async fn main() {
@@ -23,14 +24,18 @@ async fn main() {
     let db_connect_options: ConnectOptions = config.database.into();
     let db_connection = Database::connect(db_connect_options)
         .await
-        .expect("Cannot create connection pool");
+        .unwrap_or_else(|_| {
+            error!("Cannot create connection pool");
+            panic!()
+        });
 
     match config.command {
-        Commands::Migrate => {
-            Migrator::up(&db_connection, None)
-                .await
-                .expect("Migration not successful");
-        }
+        Commands::Migrate => Migrator::up(&db_connection, None)
+            .await
+            .unwrap_or_else(|_| {
+                error!("Migration not successful");
+                panic!()
+            }),
         Commands::Run(run_args) => {
             let state = State::new(Repository::new(db_connection));
             let router: AxumRouter = Router::new(run_args.root_path.into(), state).into();
@@ -38,7 +43,10 @@ async fn main() {
             Server::bind(&run_args.bind_address)
                 .serve(router.into_make_service())
                 .await
-                .expect("Cannot start server");
+                .unwrap_or_else(|_| {
+                    error!("Cannot start server ({})", run_args.bind_address);
+                    panic!()
+                });
         }
     }
 }

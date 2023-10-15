@@ -4,46 +4,28 @@ use axum::{
     Json,
     Router,
 };
-use chrono::{NaiveDateTime, Utc};
-use database::{WishlistsCreatePayload, WishlistsResponse, WishlistsUpdatePayload};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{errors::AppError, state::State};
 
+pub type Id = Uuid;
+type Predicate = &'static str;
+
 #[derive(Deserialize)]
-struct HttpCreatePayload {
+struct CreatePayload {
     name: String,
     user_id: Uuid,
 }
 
-impl From<HttpCreatePayload> for WishlistsCreatePayload {
-    fn from(val: HttpCreatePayload) -> Self {
-        WishlistsCreatePayload {
-            id: Uuid::new_v4(),
-            name: val.name,
-            user_id: val.user_id,
-            created_at: Utc::now().naive_utc(),
-        }
-    }
-}
-
 #[derive(Deserialize)]
-struct HttpUpdatePayload {
+struct UpdatePayload {
     name: String,
 }
 
-impl From<HttpUpdatePayload> for WishlistsUpdatePayload {
-    fn from(val: HttpUpdatePayload) -> Self {
-        WishlistsUpdatePayload {
-            name: val.name,
-            updated_at: Utc::now().naive_utc(),
-        }
-    }
-}
-
 #[derive(Serialize)]
-struct HttpResponse {
+struct Response {
     id: Uuid,
     name: String,
     user_id: Uuid,
@@ -51,21 +33,9 @@ struct HttpResponse {
     updated_at: NaiveDateTime,
 }
 
-impl From<WishlistsResponse> for HttpResponse {
-    fn from(value: WishlistsResponse) -> Self {
-        HttpResponse {
-            id: value.id,
-            name: value.name,
-            user_id: value.user_id,
-            created_at: value.created_at,
-            updated_at: value.updated_at,
-        }
-    }
-}
-
 async fn list(
     AxumState(state): AxumState<State>,
-) -> Result<(StatusCode, Json<Vec<HttpResponse>>), AppError> {
+) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
     let response = state
         .repository
         .list_wishlists()
@@ -79,8 +49,8 @@ async fn list(
 
 async fn create(
     AxumState(state): AxumState<State>,
-    Json(payload): Json<HttpCreatePayload>,
-) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    Json(payload): Json<CreatePayload>,
+) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = state
         .repository
         .create_wishlist(payload.into())
@@ -93,7 +63,7 @@ async fn create(
 async fn get(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-) -> Result<(StatusCode, Json<Option<HttpResponse>>), AppError> {
+) -> Result<(StatusCode, Json<Option<Response>>), AppError> {
     let response = state.repository.get_wishlist(id).await?.map(Into::into);
 
     Ok((StatusCode::OK, Json(response)))
@@ -102,8 +72,8 @@ async fn get(
 async fn update(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<HttpUpdatePayload>,
-) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    Json(payload): Json<UpdatePayload>,
+) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = state
         .repository
         .update_wishlist(id, payload.into())

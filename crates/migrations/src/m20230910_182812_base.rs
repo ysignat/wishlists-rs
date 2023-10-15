@@ -11,14 +11,8 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Users::Table)
                     .col(ColumnDef::new(Users::Id).uuid().primary_key())
-                    .col(ColumnDef::new(Users::FirstName).string_len(100))
-                    .col(ColumnDef::new(Users::SecondName).string_len(100))
-                    .col(
-                        ColumnDef::new(Users::NickName)
-                            .string_len(100)
-                            .unique_key()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(Users::Name).string_len(100).not_null())
+                    .col(ColumnDef::new(Users::AvatarId).uuid())
                     .col(ColumnDef::new(Users::CreatedAt).timestamp().not_null())
                     .col(ColumnDef::new(Users::UpdatedAt).timestamp().not_null())
                     .to_owned(),
@@ -57,6 +51,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Items::Description).string_len(300))
                     .col(ColumnDef::new(Items::Price).integer())
                     .col(ColumnDef::new(Items::IsHidden).boolean().not_null())
+                    .col(ColumnDef::new(Items::PictureId).uuid())
                     .col(ColumnDef::new(Items::CreatedAt).timestamp().not_null())
                     .col(ColumnDef::new(Items::UpdatedAt).timestamp().not_null())
                     .foreign_key(
@@ -79,10 +74,50 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
+        manager
+            .create_table(
+                Table::create()
+                    .table(Subscriptions::Table)
+                    .col(ColumnDef::new(Subscriptions::Id).uuid().primary_key())
+                    .col(ColumnDef::new(Subscriptions::UserId).uuid().not_null())
+                    .col(
+                        ColumnDef::new(Subscriptions::SubscriberId)
+                            .uuid()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(Subscriptions::CreatedAt)
+                            .timestamp()
+                            .not_null(),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from_tbl(Subscriptions::Table)
+                            .from_col(Subscriptions::UserId)
+                            .to_tbl(Users::Table)
+                            .to_col(Users::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from_tbl(Subscriptions::Table)
+                            .from_col(Subscriptions::SubscriberId)
+                            .to_tbl(Users::Table)
+                            .to_col(Users::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+
         Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .drop_table(Table::drop().table(Subscriptions::Table).to_owned())
+            .await?;
+
         manager
             .drop_table(Table::drop().table(Items::Table).to_owned())
             .await?;
@@ -103,9 +138,8 @@ impl MigrationTrait for Migration {
 enum Users {
     Table,
     Id,
-    FirstName,
-    SecondName,
-    NickName,
+    Name,
+    AvatarId,
     CreatedAt,
     UpdatedAt,
 }
@@ -130,6 +164,16 @@ enum Items {
     Description,
     Price,
     IsHidden,
+    PictureId,
     CreatedAt,
     UpdatedAt,
+}
+
+#[derive(Iden)]
+enum Subscriptions {
+    Table,
+    Id,
+    UserId,
+    SubscriberId,
+    CreatedAt,
 }

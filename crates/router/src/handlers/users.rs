@@ -4,77 +4,41 @@ use axum::{
     Json,
     Router,
 };
-use chrono::{NaiveDateTime, Utc};
-use database::{UsersCreatePayload, UsersResponse, UsersUpdatePayload};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{errors::AppError, state::State};
 
-#[derive(Deserialize)]
-struct HttpCreatePayload {
-    first_name: Option<String>,
-    second_name: Option<String>,
-    nick_name: String,
-}
+pub type Id = Uuid;
+type AvatarId = Uuid;
+type Predicate = &'static str;
 
-impl From<HttpCreatePayload> for UsersCreatePayload {
-    fn from(val: HttpCreatePayload) -> Self {
-        UsersCreatePayload {
-            id: Uuid::new_v4(),
-            first_name: val.first_name,
-            second_name: val.second_name,
-            nick_name: val.nick_name,
-            created_at: Utc::now().naive_utc(),
-        }
-    }
+#[derive(Deserialize)]
+struct CreatePayload {
+    name: String,
+    avatar_id: Option<AvatarId>,
 }
 
 #[derive(Deserialize)]
-struct HttpUpdatePayload {
-    first_name: Option<String>,
-    second_name: Option<String>,
-    nick_name: String,
-}
-
-impl From<HttpUpdatePayload> for UsersUpdatePayload {
-    fn from(val: HttpUpdatePayload) -> Self {
-        UsersUpdatePayload {
-            first_name: val.first_name,
-            second_name: val.second_name,
-            nick_name: val.nick_name,
-            updated_at: Utc::now().naive_utc(),
-        }
-    }
+struct UpdatePayload {
+    name: String,
+    avatar_id: Option<AvatarId>,
 }
 
 #[derive(Serialize)]
-struct HttpResponse {
+struct Response {
     id: Uuid,
-    first_name: Option<String>,
-    second_name: Option<String>,
-    nick_name: String,
+    name: String,
+    avatar_id: Option<AvatarId>,
     created_at: NaiveDateTime,
     updated_at: NaiveDateTime,
 }
 
-impl From<UsersResponse> for HttpResponse {
-    fn from(value: UsersResponse) -> Self {
-        HttpResponse {
-            id: value.id,
-            first_name: value.first_name,
-            second_name: value.second_name,
-            nick_name: value.nick_name,
-            created_at: value.created_at,
-            updated_at: value.updated_at,
-        }
-    }
-}
-
 async fn create(
     AxumState(state): AxumState<State>,
-    Json(payload): Json<HttpCreatePayload>,
-) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    Json(payload): Json<CreatePayload>,
+) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = state.repository.create_user(payload.into()).await?.into();
 
     Ok((StatusCode::CREATED, Json(response)))
@@ -82,7 +46,7 @@ async fn create(
 
 async fn list(
     AxumState(state): AxumState<State>,
-) -> Result<(StatusCode, Json<Vec<HttpResponse>>), AppError> {
+) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
     let response = state
         .repository
         .list_users()
@@ -97,7 +61,7 @@ async fn list(
 async fn get(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-) -> Result<(StatusCode, Json<Option<HttpResponse>>), AppError> {
+) -> Result<(StatusCode, Json<Option<Response>>), AppError> {
     let response = state.repository.get_user(id).await?.map(Into::into);
 
     Ok((StatusCode::OK, Json(response)))
@@ -106,8 +70,8 @@ async fn get(
 async fn update(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<HttpUpdatePayload>,
-) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    Json(payload): Json<UpdatePayload>,
+) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = state
         .repository
         .update_user(id, payload.into())

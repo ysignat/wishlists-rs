@@ -20,7 +20,8 @@ sea-orm = { version = "0.12.2", default-features = false, features = [
   "sqlx-postgres",
   "debug-print",
 ] }
-serde = { version = "1.0.188", features = ["derive"] }
+thiserror = "1.0.48"
+aws-sdk-s3 = { version = "0.33.0", default-features = false }
 
 [lib]
 name = "database"

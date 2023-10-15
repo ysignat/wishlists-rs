@@ -15,13 +15,11 @@ members = [
   "./crates/entities",
   "./crates/database",
   "./crates/router",
-  "./crates/s3",
 ]
 
 [dependencies]
 database = { path = "./crates/database" }
 router = { path = "./crates/router" }
-s3 = { path = "./crates/s3" }
 axum = "0.6.20"
 tokio = { version = "1.32.0", features = ["macros", "rt-multi-thread"] }
 clap = { version = "4.4.2", features = ["derive", "env", "string"] }

@@ -13,6 +13,7 @@ pub struct Model {
     pub description: Option<String>,
     pub price: Option<i32>,
     pub is_hidden: bool,
+    pub picture_id: Option<Uuid>,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }

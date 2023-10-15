@@ -4,88 +4,55 @@ use axum::{
     Json,
     Router,
 };
-use chrono::{NaiveDateTime, Utc};
-use database::{ItemsCreatePayload, ItemsResponse, ItemsUpdatePayload};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use super::{users, wishlists};
 use crate::{errors::AppError, state::State};
 
+type Id = Uuid;
+type PictureId = Uuid;
+type Predicate = &'static str;
+
 #[derive(Deserialize)]
-struct HttpCreatePayload {
-    wishlist_id: Uuid,
+struct CreatePayload {
+    wishlist_id: wishlists::Id,
     name: String,
     description: Option<String>,
     price: Option<i32>,
     is_hidden: bool,
-}
-
-impl From<HttpCreatePayload> for ItemsCreatePayload {
-    fn from(val: HttpCreatePayload) -> Self {
-        ItemsCreatePayload {
-            id: Uuid::new_v4(),
-            wishlist_id: val.wishlist_id,
-            name: val.name,
-            description: val.description,
-            price: val.price,
-            is_hidden: val.is_hidden,
-            created_at: Utc::now().naive_utc(),
-        }
-    }
+    picture_id: Option<PictureId>,
 }
 
 #[derive(Deserialize)]
-struct HttpUpdatePayload {
+struct UpdatePayload {
+    wishlist_id: wishlists::Id,
+    selected_by_id: Option<users::Id>,
     name: String,
     description: Option<String>,
     price: Option<i32>,
     is_hidden: bool,
-}
-
-impl From<HttpUpdatePayload> for ItemsUpdatePayload {
-    fn from(val: HttpUpdatePayload) -> Self {
-        ItemsUpdatePayload {
-            name: val.name,
-            description: val.description,
-            price: val.price,
-            is_hidden: val.is_hidden,
-            updated_at: Utc::now().naive_utc(),
-        }
-    }
+    picture_id: Option<PictureId>,
 }
 
 #[derive(Serialize)]
-struct HttpResponse {
-    id: Uuid,
-    wishlist_id: Uuid,
-    selected_by_id: Option<Uuid>,
+struct Response {
+    id: Id,
+    wishlist_id: wishlists::Id,
+    selected_by_id: Option<users::Id>,
     name: String,
     description: Option<String>,
     price: Option<i32>,
     is_hidden: bool,
+    picture_id: Option<PictureId>,
     created_at: NaiveDateTime,
     updated_at: NaiveDateTime,
 }
 
-impl From<ItemsResponse> for HttpResponse {
-    fn from(value: ItemsResponse) -> Self {
-        HttpResponse {
-            id: value.id,
-            wishlist_id: value.wishlist_id,
-            selected_by_id: value.selected_by_id,
-            name: value.name,
-            description: value.description,
-            price: value.price,
-            is_hidden: value.is_hidden,
-            created_at: value.created_at,
-            updated_at: value.updated_at,
-        }
-    }
-}
-
 async fn list(
     AxumState(state): AxumState<State>,
-) -> Result<(StatusCode, Json<Vec<HttpResponse>>), AppError> {
+) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
     let response = state
         .repository
         .list_items()
@@ -99,8 +66,8 @@ async fn list(
 
 async fn create(
     AxumState(state): AxumState<State>,
-    Json(payload): Json<HttpCreatePayload>,
-) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    Json(payload): Json<CreatePayload>,
+) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = state.repository.create_item(payload.into()).await?.into();
 
     Ok((StatusCode::CREATED, Json(response)))
@@ -109,8 +76,8 @@ async fn create(
 async fn get(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-) -> Result<(StatusCode, Json<Option<HttpResponse>>), AppError> {
-    let response = state.repository.get_item(id).await?.map(Into::into);
+) -> Result<(StatusCode, Json<Option<Response>>), AppError> {
+    let response = state.repository.get_item_by_id(id).await?.map(Into::into);
 
     Ok((StatusCode::OK, Json(response)))
 }
@@ -118,8 +85,8 @@ async fn get(
 async fn update(
     AxumState(state): AxumState<State>,
     Path(id): Path<Uuid>,
-    Json(payload): Json<HttpUpdatePayload>,
-) -> Result<(StatusCode, Json<HttpResponse>), AppError> {
+    Json(payload): Json<UpdatePayload>,
+) -> Result<(StatusCode, Json<Response>), AppError> {
     let response = state
         .repository
         .update_item(id, payload.into())

@@ -1,18 +1,13 @@
 use async_trait::async_trait;
 use entities::wishlists::{ActiveModel, Column, Entity, Model};
-use sea_orm::{
-    ActiveModelTrait,
-    ColumnTrait,
-    Condition,
-    DatabaseConnection,
-    EntityTrait,
-    QueryFilter,
-    QueryOrder,
-};
+use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, QueryOrder};
 
-use crate::interfaces::{
-    items,
-    wishlists::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
+use crate::{
+    interfaces::{
+        items,
+        wishlists::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
+    },
+    Repository,
 };
 
 impl From<Payload> for Model {
@@ -37,10 +32,6 @@ impl From<Model> for Response {
             updated_at: value.updated_at,
         }
     }
-}
-
-struct Repository {
-    database_connection: DatabaseConnection,
 }
 
 #[async_trait]

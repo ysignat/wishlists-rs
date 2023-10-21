@@ -1,22 +1,9 @@
 use std::sync::Arc;
 
-use database::{
-    ItemsRepository,
-    Repository,
-    SubscriptionsRepository,
-    UsersRepository,
-    WishlistsRepository,
-};
+use database::{Repository, RepositoryTrait};
 
 pub struct State {
-    pub(crate) repository: Arc<
-        dyn ItemsRepository
-            + SubscriptionsRepository
-            + UsersRepository
-            + WishlistsRepository
-            + Send
-            + Sync,
-    >,
+    pub repository: Arc<dyn RepositoryTrait + Send + Sync>,
 }
 
 impl Clone for State {

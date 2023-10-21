@@ -1,22 +1,36 @@
 use axum::{
-    extract::{Path, State as AxumState},
+    extract::{Path, Query, State as AxumState},
     http::StatusCode,
     Json,
     Router,
 };
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
+use database::interfaces::wishlists::{Payload as DatabasePayload, Response as DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use super::items;
 use crate::{errors::AppError, state::State};
 
 pub type Id = Uuid;
-type Predicate = &'static str;
+pub(crate) type Predicate = String;
 
 #[derive(Deserialize)]
 struct CreatePayload {
     name: String,
     user_id: Uuid,
+}
+
+impl From<CreatePayload> for DatabasePayload {
+    fn from(val: CreatePayload) -> Self {
+        DatabasePayload {
+            id: Uuid::new_v4(),
+            name: val.name,
+            user_id: val.user_id,
+            created_at: Utc::now().naive_utc(),
+            updated_at: Utc::now().naive_utc(),
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -25,7 +39,7 @@ struct UpdatePayload {
 }
 
 #[derive(Serialize)]
-struct Response {
+pub(crate) struct Response {
     id: Uuid,
     name: String,
     user_id: Uuid,
@@ -33,12 +47,25 @@ struct Response {
     updated_at: NaiveDateTime,
 }
 
+impl From<DatabaseResponse> for Response {
+    fn from(val: DatabaseResponse) -> Self {
+        Response {
+            id: val.id,
+            name: val.name,
+            user_id: val.user_id,
+            created_at: val.created_at,
+            updated_at: val.updated_at,
+        }
+    }
+}
+
 async fn list(
     AxumState(state): AxumState<State>,
+    Query(predicate): Query<Option<Predicate>>,
 ) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
     let response = state
         .repository
-        .list_wishlists()
+        .list_wishlists(predicate)
         .await?
         .into_iter()
         .map(Into::into)
@@ -74,13 +101,27 @@ async fn update(
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdatePayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let response = state
-        .repository
-        .update_wishlist(id, payload.into())
-        .await?
-        .into();
+    match state.repository.get_wishlist(id).await? {
+        Some(object) => {
+            let response = state
+                .repository
+                .update_wishlist(
+                    id,
+                    DatabasePayload {
+                        id,
+                        name: payload.name,
+                        user_id: object.user_id,
+                        created_at: object.created_at,
+                        updated_at: Utc::now().naive_utc(),
+                    },
+                )
+                .await?
+                .into();
 
-    Ok((StatusCode::OK, Json(response)))
+            Ok((StatusCode::OK, Json(response)))
+        }
+        None => todo!(),
+    }
 }
 
 async fn delete(
@@ -90,6 +131,22 @@ async fn delete(
     state.repository.delete_wishlist(id).await?;
 
     Ok((StatusCode::NO_CONTENT, "Object removed".to_owned()))
+}
+
+async fn list_items(
+    AxumState(state): AxumState<State>,
+    Path(id): Path<Uuid>,
+    Query(predicate): Query<Option<items::Predicate>>,
+) -> Result<(StatusCode, Json<Vec<items::Response>>), AppError> {
+    let response = state
+        .repository
+        .list_wishlist_items(id, predicate)
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 static SUBPATH: &str = "/wishlists";

@@ -95,7 +95,7 @@ impl RepositoryTrait for Repository {
     ) -> Result<Vec<wishlists::Response>, Error> {
         let condition = Condition::all()
             .add(entities::wishlists::Column::UserId.eq(id))
-            .add(entities::wishlists::Column::Name.like(predicate.unwrap_or("")));
+            .add(entities::wishlists::Column::Name.like(predicate.unwrap_or_default()));
 
         entities::wishlists::Entity::find()
             .filter(condition)
@@ -120,7 +120,7 @@ impl RepositoryTrait for Repository {
                         .clone(),
                 ),
             )
-            .add(Column::Name.like(predicate.unwrap_or("")));
+            .add(Column::Name.like(predicate.unwrap_or_default()));
 
         Entity::find()
             .filter(Condition::any().add(condition))
@@ -146,7 +146,7 @@ impl RepositoryTrait for Repository {
                         .clone(),
                 ),
             )
-            .add(Column::Name.like(predicate.unwrap_or("")));
+            .add(Column::Name.like(predicate.unwrap_or_default()));
 
         Entity::find()
             .filter(Condition::any().add(condition))

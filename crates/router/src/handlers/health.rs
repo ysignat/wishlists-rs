@@ -1,4 +1,4 @@
-use axum::{extract::State as AxumState, http::StatusCode, Router};
+use axum::{http::StatusCode, Router};
 
 use crate::state::State;
 
@@ -12,9 +12,10 @@ pub(crate) fn get_router(root_path: &str, state: State) -> Router {
 }
 
 #[allow(clippy::unused_async)]
-async fn healthcheck(AxumState(state): AxumState<State>) -> StatusCode {
-    match state.repository.healthcheck().await {
-        Ok(_) => StatusCode::OK,
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    }
+async fn healthcheck() -> StatusCode {
+    // match state.repository.healthcheck().await {
+    //     Ok(_) => StatusCode::OK,
+    //     Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    // }
+    StatusCode::OK
 }

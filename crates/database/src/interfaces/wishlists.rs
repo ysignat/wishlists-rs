@@ -12,7 +12,7 @@ pub enum Error {
 }
 
 pub type Id = Uuid;
-pub type Predicate = &'static str;
+pub type Predicate = String;
 
 pub struct Payload {
     pub id: Id,

@@ -94,7 +94,7 @@ impl RepositoryTrait for Repository {
     ) -> Result<Vec<items::Response>, Error> {
         let condition = Condition::all()
             .add(entities::items::Column::WishlistId.eq(id))
-            .add(entities::items::Column::Name.like(predicate.unwrap_or("")));
+            .add(entities::items::Column::Name.like(predicate.unwrap_or_default()));
 
         entities::items::Entity::find()
             .filter(condition)

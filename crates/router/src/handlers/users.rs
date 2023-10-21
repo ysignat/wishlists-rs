@@ -1,29 +1,41 @@
 use axum::{
-    extract::{Path, State as AxumState},
+    extract::{Path, Query, State as AxumState},
     http::StatusCode,
     Json,
     Router,
 };
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
+use database::interfaces::users::{Payload as DatabasePayload, Response as DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use super::wishlists;
 use crate::{errors::AppError, state::State};
 
 pub type Id = Uuid;
 type AvatarId = Uuid;
-type Predicate = &'static str;
+type Predicate = String;
 
 #[derive(Deserialize)]
 struct CreatePayload {
     name: String,
-    avatar_id: Option<AvatarId>,
+}
+
+impl From<CreatePayload> for DatabasePayload {
+    fn from(val: CreatePayload) -> Self {
+        DatabasePayload {
+            id: Uuid::new_v4(),
+            name: val.name,
+            avatar_id: None,
+            created_at: Utc::now().naive_utc(),
+            updated_at: Utc::now().naive_utc(),
+        }
+    }
 }
 
 #[derive(Deserialize)]
 struct UpdatePayload {
     name: String,
-    avatar_id: Option<AvatarId>,
 }
 
 #[derive(Serialize)]
@@ -33,6 +45,18 @@ struct Response {
     avatar_id: Option<AvatarId>,
     created_at: NaiveDateTime,
     updated_at: NaiveDateTime,
+}
+
+impl From<DatabaseResponse> for Response {
+    fn from(val: DatabaseResponse) -> Self {
+        Response {
+            id: val.id,
+            name: val.name,
+            avatar_id: val.avatar_id,
+            created_at: val.created_at,
+            updated_at: val.updated_at,
+        }
+    }
 }
 
 async fn create(
@@ -46,10 +70,11 @@ async fn create(
 
 async fn list(
     AxumState(state): AxumState<State>,
+    Query(predicate): Query<Option<Predicate>>,
 ) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
     let response = state
         .repository
-        .list_users()
+        .list_users(predicate)
         .await?
         .into_iter()
         .map(Into::into)
@@ -72,13 +97,27 @@ async fn update(
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdatePayload>,
 ) -> Result<(StatusCode, Json<Response>), AppError> {
-    let response = state
-        .repository
-        .update_user(id, payload.into())
-        .await?
-        .into();
+    match state.repository.get_user(id).await? {
+        Some(object) => {
+            let response = state
+                .repository
+                .update_user(
+                    id,
+                    DatabasePayload {
+                        id,
+                        name: payload.name,
+                        avatar_id: object.avatar_id,
+                        created_at: object.created_at,
+                        updated_at: Utc::now().naive_utc(),
+                    },
+                )
+                .await?
+                .into();
 
-    Ok((StatusCode::OK, Json(response)))
+            Ok((StatusCode::OK, Json(response)))
+        }
+        None => todo!(),
+    }
 }
 
 async fn delete(
@@ -88,6 +127,54 @@ async fn delete(
     state.repository.delete_user(id).await?;
 
     Ok((StatusCode::NO_CONTENT, "Object removed".to_owned()))
+}
+
+async fn list_subscribers(
+    AxumState(state): AxumState<State>,
+    Path(id): Path<Uuid>,
+    Query(predicate): Query<Option<Predicate>>,
+) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
+    let response = state
+        .repository
+        .list_user_subscribers(id, predicate)
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    Ok((StatusCode::OK, Json(response)))
+}
+
+async fn list_subscriptions(
+    AxumState(state): AxumState<State>,
+    Path(id): Path<Uuid>,
+    Query(predicate): Query<Option<Predicate>>,
+) -> Result<(StatusCode, Json<Vec<Response>>), AppError> {
+    let response = state
+        .repository
+        .list_user_subscriptions(id, predicate)
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    Ok((StatusCode::OK, Json(response)))
+}
+
+async fn list_wishlists(
+    AxumState(state): AxumState<State>,
+    Path(id): Path<Uuid>,
+    Query(predicate): Query<Option<wishlists::Predicate>>,
+) -> Result<(StatusCode, Json<Vec<wishlists::Response>>), AppError> {
+    let response = state
+        .repository
+        .list_user_wishlists(id, predicate)
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 static SUBPATH: &str = "/users";

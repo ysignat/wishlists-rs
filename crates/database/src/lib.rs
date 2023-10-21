@@ -6,7 +6,7 @@ use sea_orm::DatabaseConnection;
 use thiserror::Error;
 
 mod implementations;
-mod interfaces;
+pub mod interfaces;
 
 #[derive(Debug, Error)]
 enum Error {
@@ -33,7 +33,7 @@ impl RepositoryTrait for Repository {}
 
 impl Repository {
     #[must_use]
-    fn new(database_connection: DatabaseConnection, s3_client: Client) -> Self {
+    pub fn new(database_connection: DatabaseConnection, s3_client: Client) -> Self {
         Self {
             database_connection,
             s3_client,

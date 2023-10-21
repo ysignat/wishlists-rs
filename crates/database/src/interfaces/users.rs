@@ -6,7 +6,7 @@ use uuid::Uuid;
 use super::{user_avatars, wishlists};
 
 pub type Id = Uuid;
-pub type Predicate = &'static str;
+pub type Predicate = String;
 
 #[derive(Debug, Error)]
 pub enum Error {

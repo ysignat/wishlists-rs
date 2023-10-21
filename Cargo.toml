@@ -21,8 +21,8 @@ members = [
 database = { path = "./crates/database" }
 router = { path = "./crates/router" }
 axum = "0.6.20"
-tokio = { version = "1.32.0", features = ["macros", "rt-multi-thread"] }
-clap = { version = "4.4.2", features = ["derive", "env", "string"] }
+tokio = { version = "1.33.0", features = ["macros", "rt-multi-thread"] }
+clap = { version = "4.4.6", features = ["derive", "env", "string"] }
 log = { version = "0.4.20", features = ["std"] }
 tracing-subscriber = { version = "0.3.17", features = ["json"] }
-tracing = "0.1.37"
+tracing = "0.1.40"

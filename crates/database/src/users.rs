@@ -3,13 +3,11 @@ use entities::users::{ActiveModel, Column, Entity, Model};
 use migrations::{Expr, Query};
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, QueryOrder};
 
-use crate::{
-    interfaces::{
-        users::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
-        wishlists,
-    },
-    Repository,
+use super::traits::{
+    users::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
+    wishlists,
 };
+use crate::Repository;
 
 impl From<Payload> for Model {
     fn from(value: Payload) -> Self {

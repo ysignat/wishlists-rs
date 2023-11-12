@@ -9,20 +9,19 @@ name = "app"
 path = "src/main.rs"
 
 [workspace]
-members = [
-  ".",
-  "./crates/migrations",
-  "./crates/entities",
-  "./crates/database",
-  "./crates/router",
-]
+members = [".", "./crates/migrations", "./crates/entities", "./crates/database"]
 
 [dependencies]
 database = { path = "./crates/database" }
-router = { path = "./crates/router" }
+migrations = { path = "./crates/migrations" }
+entities = { path = "./crates/entities" }
 axum = "0.6.20"
 tokio = { version = "1.33.0", features = ["macros", "rt-multi-thread"] }
 clap = { version = "4.4.6", features = ["derive", "env", "string"] }
 log = { version = "0.4.20", features = ["std"] }
 tracing-subscriber = { version = "0.3.17", features = ["json"] }
 tracing = "0.1.40"
+serde = { version = "1.0.189", features = ["derive"] }
+uuid = { version = "1.5.0", features = ["v4", "serde"] }
+anyhow = "1.0.75"
+chrono = { version = "0.4.31", features = ["serde"] }

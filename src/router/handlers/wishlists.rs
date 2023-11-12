@@ -5,12 +5,12 @@ use axum::{
     Router,
 };
 use chrono::{NaiveDateTime, Utc};
-use database::interfaces::wishlists::{Payload as DatabasePayload, Response as DatabaseResponse};
+use database::traits::wishlists::{Payload as DatabasePayload, Response as DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::items;
-use crate::{errors::AppError, state::State};
+use crate::router::{errors::AppError, state::State};
 
 pub type Id = Uuid;
 pub(crate) type Predicate = String;

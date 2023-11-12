@@ -2,10 +2,8 @@ use async_trait::async_trait;
 use entities::items::{ActiveModel, Column, Entity, Model};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 
-use crate::{
-    interfaces::items::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
-    Repository,
-};
+use super::traits::items::{Error, Id, Payload, Predicate, RepositoryTrait, Response};
+use crate::Repository;
 
 impl From<Payload> for Model {
     fn from(value: Payload) -> Self {

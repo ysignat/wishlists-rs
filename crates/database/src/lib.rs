@@ -1,12 +1,23 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
-use aws_sdk_s3::Client;
-use interfaces::{item_pictures, items, subscriptions, user_avatars, users, wishlists};
-use sea_orm::DatabaseConnection;
+pub use aws_sdk_s3::{
+    config::{
+        Config as BlobStorageConfig,
+        Credentials as BlobStorageCredentials,
+        Region as BlobStorageRegion,
+    },
+    Client as BlobStorageClient,
+};
+pub use sea_orm::{ConnectOptions as DatabaseConnectOptions, Database, DatabaseConnection};
 use thiserror::Error;
 
-mod implementations;
-pub mod interfaces;
+mod item_pictures;
+mod items;
+mod subscriptions;
+pub mod traits;
+mod user_avatars;
+mod users;
+mod wishlists;
 
 #[derive(Debug, Error)]
 enum Error {
@@ -14,18 +25,13 @@ enum Error {
     Unknown,
 }
 
-pub struct Repository {
-    database_connection: DatabaseConnection,
-    s3_client: Client,
-}
-
 pub trait RepositoryTrait:
-    item_pictures::RepositoryTrait
-    + items::RepositoryTrait
-    + subscriptions::RepositoryTrait
-    + user_avatars::RepositoryTrait
-    + users::RepositoryTrait
-    + wishlists::RepositoryTrait
+    traits::item_pictures::RepositoryTrait
+    + traits::items::RepositoryTrait
+    + traits::subscriptions::RepositoryTrait
+    + traits::user_avatars::RepositoryTrait
+    + traits::users::RepositoryTrait
+    + traits::wishlists::RepositoryTrait
 {
 }
 
@@ -33,10 +39,13 @@ impl RepositoryTrait for Repository {}
 
 impl Repository {
     #[must_use]
-    pub fn new(database_connection: DatabaseConnection, s3_client: Client) -> Self {
+    pub fn new(
+        database_connection: DatabaseConnection,
+        blob_storage_client: BlobStorageClient,
+    ) -> Self {
         Self {
             database_connection,
-            s3_client,
+            blob_storage_client,
         }
     }
 
@@ -47,4 +56,9 @@ impl Repository {
     //         .map(|_| ())
     //         .or(Err(Error::Unknown))
     // }
+}
+
+pub struct Repository {
+    database_connection: DatabaseConnection,
+    blob_storage_client: BlobStorageClient,
 }

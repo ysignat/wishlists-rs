@@ -2,13 +2,11 @@ use async_trait::async_trait;
 use entities::wishlists::{ActiveModel, Column, Entity, Model};
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, QueryOrder};
 
-use crate::{
-    interfaces::{
-        items,
-        wishlists::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
-    },
-    Repository,
+use super::traits::{
+    items,
+    wishlists::{Error, Id, Payload, Predicate, RepositoryTrait, Response},
 };
+use crate::Repository;
 
 impl From<Payload> for Model {
     fn from(value: Payload) -> Self {

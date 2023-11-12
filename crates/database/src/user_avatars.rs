@@ -1,15 +1,13 @@
 use async_trait::async_trait;
 use aws_sdk_s3::primitives::ByteStream;
 
-use crate::{
-    interfaces::item_pictures::{Error, Key, RepositoryTrait, Value},
-    Repository,
-};
+use super::traits::user_avatars::{Error, Key, RepositoryTrait, Value};
+use crate::Repository;
 
 #[async_trait]
 impl RepositoryTrait for Repository {
     async fn get_item_picture(&self, key: Key) -> Result<Value, Error> {
-        self.s3_client
+        self.blob_storage_client
             .get_object()
             .key(key.to_string())
             .send()
@@ -19,7 +17,7 @@ impl RepositoryTrait for Repository {
     }
 
     async fn put_item_picture(&self, key: Key, value: ByteStream) -> Result<(), Error> {
-        self.s3_client
+        self.blob_storage_client
             .put_object()
             .key(key.to_string())
             .body(value)
@@ -30,7 +28,7 @@ impl RepositoryTrait for Repository {
     }
 
     async fn delete_item_picture(&self, key: Key) -> Result<(), Error> {
-        self.s3_client
+        self.blob_storage_client
             .delete_object()
             .key(key.to_string())
             .send()

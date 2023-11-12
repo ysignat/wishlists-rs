@@ -1,17 +1,24 @@
 use std::{net::SocketAddr, time::Duration};
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use database::ConnectOptions;
+use database::{
+    BlobStorageConfig,
+    BlobStorageCredentials,
+    BlobStorageRegion,
+    DatabaseConnectOptions,
+};
 use tracing_subscriber::filter::LevelFilter;
 
 const ENV_PREFIX: &str = "WISHLISTS";
 const ENV_SEPARATOR: &str = "__";
 
 const DATABASE_ENV_PREFIX: &str = "DATABASE";
+const BLOB_STORAGE_ENV_PREFIX: &str = "BS";
 const RUN_ENV_PREFIX: &str = "RUN";
 const LOG_ENV_PREFIX: &str = "LOG";
 
 const LONG_SEPARATOR: &str = "-";
+const BLOB_STORAGE_LONG_PREFIX: &str = "bs";
 const DATABASE_LONG_PREFIX: &str = "database";
 const RUN_LONG_PREFIX: &str = "run";
 const LOG_LONG_PREFIX: &str = "log";
@@ -74,6 +81,8 @@ pub struct Config {
     pub database: DatabaseArgs,
     #[command(flatten)]
     pub log: LogArgs,
+    #[command(flatten)]
+    pub blob_storage: BlobStorageArgs,
 }
 
 #[derive(Subcommand, PartialEq, Eq)]
@@ -138,9 +147,9 @@ pub struct DatabaseArgs {
     max_lifetime: Option<u64>,
 }
 
-impl From<DatabaseArgs> for ConnectOptions {
+impl From<DatabaseArgs> for DatabaseConnectOptions {
     fn from(value: DatabaseArgs) -> Self {
-        let mut database_connection = ConnectOptions::new(value.url);
+        let mut database_connection = Self::new(value.url);
 
         if let Some(max_connections) = value.max_connections {
             database_connection.max_connections(max_connections);
@@ -167,6 +176,76 @@ impl From<DatabaseArgs> for ConnectOptions {
         }
 
         database_connection
+    }
+}
+
+#[derive(Args)]
+pub struct BlobStorageArgs {
+    #[arg(
+        long = LongArg::construct(&[BLOB_STORAGE_LONG_PREFIX,"access-key-id"]),
+        env = EnvArg::construct(&[BLOB_STORAGE_ENV_PREFIX,"ACCESS_KEY_ID"]),
+        default_value = "",
+        help = "Blob storage access key id",
+        global = true
+    )]
+    access_key_id: String,
+    #[arg(
+        long = LongArg::construct(&[BLOB_STORAGE_LONG_PREFIX,"secret-access-key"]),
+        env = EnvArg::construct(&[BLOB_STORAGE_ENV_PREFIX,"SECRET_ACCESS_KEY"]),
+        default_value = "",
+        help = "Blob storage secret access key",
+        global = true
+    )]
+    secret_access_key: String,
+    #[arg(
+        long = LongArg::construct(&[BLOB_STORAGE_LONG_PREFIX,"session-token"]),
+        env = EnvArg::construct(&[BLOB_STORAGE_ENV_PREFIX,"SESSION_TOKEN"]),
+        default_value = None,
+        help = "Blob storage session token",
+        global = true
+    )]
+    session_token: Option<String>,
+    #[arg(
+        long = LongArg::construct(&[BLOB_STORAGE_LONG_PREFIX,"session-token"]),
+        env = EnvArg::construct(&[BLOB_STORAGE_ENV_PREFIX,"SESSION_TOKEN"]),
+        help = "Blob storage endpoint url",
+        global = true
+    )]
+    pub endpoint_url: String,
+    #[arg(
+        long = LongArg::construct(&[BLOB_STORAGE_LONG_PREFIX,"region"]),
+        env = EnvArg::construct(&[BLOB_STORAGE_ENV_PREFIX,"REGION"]),
+        default_value = None,
+        help = "Blob storage region",
+        global = true
+    )]
+    pub region: String,
+    #[arg(
+        long = LongArg::construct(&[BLOB_STORAGE_LONG_PREFIX,"force-path-style"]),
+        env = EnvArg::construct(&[BLOB_STORAGE_ENV_PREFIX,"FORCE_PATH_STYLE"]),
+        default_value = "false",
+        help = "Blob storage force bucket path style",
+        global = true
+    )]
+    pub force_path_style: bool,
+}
+
+impl From<BlobStorageArgs> for BlobStorageConfig {
+    fn from(value: BlobStorageArgs) -> Self {
+        let credentials = BlobStorageCredentials::new(
+            value.access_key_id,
+            value.secret_access_key,
+            value.session_token,
+            None,
+            "",
+        );
+
+        BlobStorageConfig::builder()
+            .endpoint_url(value.endpoint_url)
+            .region(BlobStorageRegion::new(value.region))
+            .force_path_style(value.force_path_style)
+            .credentials_provider(credentials)
+            .build()
     }
 }
 

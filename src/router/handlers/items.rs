@@ -5,12 +5,12 @@ use axum::{
     Router,
 };
 use chrono::{NaiveDateTime, Utc};
-use database::interfaces::items::{Payload as DatabasePayload, Response as DatabaseResponse};
+use database::traits::items::{Payload as DatabasePayload, Response as DatabaseResponse};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::{users, wishlists};
-use crate::{errors::AppError, state::State};
+use crate::router::{errors::AppError, state::State};
 
 type Id = Uuid;
 type PictureId = Uuid;

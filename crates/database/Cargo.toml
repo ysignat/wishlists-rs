@@ -8,10 +8,10 @@ edition = "2021"
 [dependencies]
 migrations = { path = "../migrations" }
 entities = { path = "../entities" }
-async-trait = "0.1.73"
-chrono = { version = "0.4.29", features = ["serde"] }
-uuid = { version = "1.4.1", features = ["v4", "serde"] }
-sea-orm = { version = "0.12.2", default-features = false, features = [
+async-trait = "0.1.74"
+chrono = { version = "0.4.31", features = ["serde"] }
+uuid = { version = "1.5.0", features = ["v4", "serde"] }
+sea-orm = { version = "0.12.4", default-features = false, features = [
   "chrono",
   "macros",
   "uuid",
@@ -20,7 +20,8 @@ sea-orm = { version = "0.12.2", default-features = false, features = [
   "sqlx-postgres",
   "debug-print",
 ] }
-serde = { version = "1.0.188", features = ["derive"] }
+thiserror = "1.0.50"
+aws-sdk-s3 = { version = "0.38.0", default-features = false }
 
 [lib]
 name = "database"

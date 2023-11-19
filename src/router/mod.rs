@@ -1,5 +1,3 @@
-#![forbid(unsafe_code)]
-#![warn(clippy::pedantic)]
 use axum::Router as AxumRouter;
 use handlers::{health, items, users, wishlists};
 use state::State;

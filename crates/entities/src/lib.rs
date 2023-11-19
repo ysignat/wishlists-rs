@@ -3,5 +3,6 @@
 pub mod prelude;
 
 pub mod items;
+pub mod subscriptions;
 pub mod users;
 pub mod wishlists;
